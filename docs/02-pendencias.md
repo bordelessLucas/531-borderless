@@ -1,0 +1,93 @@
+# Pendências — o que falta implementar
+
+Lista numerada por prioridade sugerida (do bloqueante ao evolutivo).
+
+## Fundação & dados
+
+1. Criar/selecionar projeto Firebase real e autenticar (`firebase login` + `use <PROJECT_ID>`)
+2. Preencher `.env.local` com a config Web do Firebase (`apps:sdkconfig WEB`)
+3. Subir emuladores locais e popular com seed (`npm run emulators` + `npm run seed`)
+4. Migrar `src/lib/repository.ts` do seed estático para queries reais no Firestore
+5. Implementar Auth (email/senha e/ou Google) com custom claims (`admin`, `operator`, cliente)
+6. Proteger rotas `/admin/*` (middleware) — só staff autenticado
+7. Área do cliente: login, meus pedidos e download de bilhetes
+
+## Pagamento
+
+8. Definir gateway (Pagar.me, Stripe ou Mercado Pago)
+9. Implementar provider concreto atrás de `PaymentRef` (Pix + cartão)
+10. Webhook de confirmação de pagamento → transição `AWAITING_PAYMENT` → `PAID`
+11. Persistência real do pedido no Firestore no checkout (hoje é mock client-side)
+12. Fluxo de cancelamento/reembolso e estorno parcial
+
+## Catálogo & CMS (completar)
+
+13. CRUD completo de `TicketType` (categorias, preço, SKU do parceiro, strategy)
+14. Editor de calendário: slots, temporadas, blackouts, lead time, validade
+15. Editor de conteúdo rico (blocos: parágrafo, heading, bullets, imagem, FAQ) com upload no Storage
+16. Editor de passaporte: composição de atrações, itens obrigatórios/opcionais, preço fechado
+17. CRUD de parceiros (integração, comissão, estratégia padrão)
+18. CRUD de sites (domínios, tema, recorte de catálogo, branding)
+19. Publicação/rascunho/arquivo com preview por site
+20. SEO por página (meta title/description, OG image, sitemap)
+
+## Disponibilidade
+
+21. Motor de disponibilidade real (interseção de calendários para passaporte)
+22. Consulta de cotas/capacidade por data e horário
+23. Integração do adapter de API com `checkAvailability` em tempo real
+24. Bloqueio de overbooking e reserva temporária no checkout (hold)
+
+## Fulfillment (operação)
+
+25. Orquestrador: ao pagar, explode `OrderItem` em N `Fulfillments`
+26. Disparo automático dos adapters `API` e enfileiramento dos `MANUAL`
+27. Fila manual funcional: upload real de PDF no Storage + marcar `ISSUED`
+28. E-mail automático ao cliente quando todos os fulfillments estiverem `ISSUED`/`DELIVERED`
+29. Retry, dead-letter e alerta de falha (`FAILED`) para a operação
+30. Cancelamento de bilhete via adapter (`cancel`) quando houver reembolso
+
+## Integrações de parceiros
+
+31. Implementar primeiro adapter real de API (ex.: `generic-rest` ou parceiro piloto)
+32. Credenciais seguras por parceiro (Secret Manager / env por adapter)
+33. Mapeamento SKU (`partnerSkuCode`) ↔ categoria local
+34. Logs de auditoria das chamadas ao parceiro
+35. Segundo e demais adapters conforme parceiros forem onboarding
+
+## Multi-site / whitelabel
+
+36. Middleware de host → site em produção (domínios customizados)
+37. Configuração de DNS/domínio por parceiro
+38. Logo, favicon e cores editáveis no admin por site
+39. Isolamento de pedidos/métricas por `siteId`
+
+## Backoffice operacional
+
+40. Listagem e detalhe de pedidos (filtro por status, site, parceiro, data)
+41. CRM leve: histórico do cliente, contatos, observações internas
+42. Métricas e relatórios (vendas, conversão, taxa de emissão manual, SLA da fila)
+43. Notificações internas (novos itens na fila, falhas de API)
+44. Gestão de usuários/staff e papéis
+
+## UX / storefront (refinar)
+
+45. Carrinho multi-item (hoje o checkout é 1 produto por vez)
+46. Agendamento pós-compra das atrações do passaporte (datas por item)
+47. Página de confirmação de pedido com status de cada emissão
+48. Mobile polish (booking panel, checkout, fila admin)
+49. Acessibilidade (foco, ARIA, contraste) e performance (imagens, LCP)
+50. Conteúdo institucional (FAQ geral, termos, política de cancelamento)
+
+## Qualidade & DevOps
+
+51. Testes unitários do domínio (disponibilidade, composição de passaporte, orquestração)
+52. Testes de integração dos adapters e webhooks de pagamento
+53. CI (lint, typecheck, build, rules do Firestore)
+54. Deploy (Vercel ou Firebase App Hosting) + ambientes staging/prod
+55. Observabilidade (Sentry/Crashlytics, logs estruturados)
+56. Backup e retenção de bilhetes no Storage
+
+---
+
+**Sugestão de próximo bloco (MVP operacional):** itens **1–6**, **8–11**, **13–16**, **25–28**.

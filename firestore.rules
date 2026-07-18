@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Papéis via custom claims no token: admin, operator (backoffice), ou cliente.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.role == 'admin';
+    }
+    function isStaff() {
+      return isSignedIn() && request.auth.token.role in ['admin', 'operator'];
+    }
+
+    // Catálogo público: leitura liberada, escrita só para staff.
+    match /sites/{id}      { allow read; allow write: if isAdmin(); }
+    match /partners/{id}   { allow read: if isStaff(); allow write: if isAdmin(); }
+    match /attractions/{id}{ allow read; allow write: if isStaff(); }
+    match /ticketTypes/{id}{ allow read; allow write: if isStaff(); }
+    match /products/{id}   { allow read; allow write: if isStaff(); }
+
+    // Pedidos: cliente lê os próprios; staff lê/gerencia todos.
+    match /orders/{id} {
+      allow read: if isStaff() || (isSignedIn() && resource.data.customerUid == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isStaff();
+    }
+
+    // Emissões: apenas backoffice (dados sensíveis do cliente/parceiro).
+    match /fulfillments/{id} {
+      allow read, write: if isStaff();
+    }
+
+    // Perfis de usuário.
+    match /users/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+      allow read: if isAdmin();
+    }
+  }
+}

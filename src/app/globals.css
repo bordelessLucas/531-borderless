@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Defaults do site principal (OneRio). Cada tenant sobrescreve via inline style. */
+  --brand: 13 26 38;
+  --brand-fg: 255 255 255;
+  --brand-muted: 233 122 60;
+
+  --surface: 255 255 255;
+  --surface-subtle: 248 249 250;
+  --surface-border: 226 229 233;
+
+  --ink: 17 24 32;
+  --ink-muted: 82 92 104;
+  --ink-subtle: 138 148 160;
+}
+
+@layer base {
+  * {
+    @apply border-surface-border;
+  }
+  body {
+    @apply bg-surface text-ink antialiased;
+    font-feature-settings: "ss01", "cv01";
+  }
+  ::selection {
+    @apply bg-brand-muted/25;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply container mx-auto;
+  }
+}
