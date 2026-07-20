@@ -1,8 +1,14 @@
 import { getPartnerById, listSites } from "@/lib/repository";
 import { Card } from "@/components/ui/card";
 
-export default function AdminSitesPage() {
-  const sites = listSites();
+export default async function AdminSitesPage() {
+  const sites = await listSites();
+  const sitesWithPartner = await Promise.all(
+    sites.map(async (site) => ({
+      site,
+      partner: site.partnerId ? await getPartnerById(site.partnerId) : null,
+    })),
+  );
 
   return (
     <div>
@@ -14,34 +20,31 @@ export default function AdminSitesPage() {
       </header>
 
       <div className="grid gap-5 md:grid-cols-2">
-        {sites.map((site) => {
-          const partner = site.partnerId ? getPartnerById(site.partnerId) : null;
-          return (
-            <Card key={site.id} className="p-6">
-              <div className="flex items-center gap-3">
-                <span
-                  className="h-10 w-10 rounded-xl"
-                  style={{ backgroundColor: `rgb(${site.theme.brand})` }}
-                />
-                <div>
-                  <h2 className="font-display text-lg font-semibold text-ink">{site.name}</h2>
-                  <p className="text-xs text-ink-subtle">
-                    {site.attractionIds === null ? "Catálogo completo" : `${site.attractionIds.length} atração(ões)`}
-                    {partner ? ` · ${partner.name}` : ""}
-                  </p>
-                </div>
+        {sitesWithPartner.map(({ site, partner }) => (
+          <Card key={site.id} className="p-6">
+            <div className="flex items-center gap-3">
+              <span
+                className="h-10 w-10 rounded-xl"
+                style={{ backgroundColor: `rgb(${site.theme.brand})` }}
+              />
+              <div>
+                <h2 className="font-display text-lg font-semibold text-ink">{site.name}</h2>
+                <p className="text-xs text-ink-subtle">
+                  {site.attractionIds === null ? "Catálogo completo" : `${site.attractionIds.length} atração(ões)`}
+                  {partner ? ` · ${partner.name}` : ""}
+                </p>
               </div>
-              <div className="mt-4">
-                <p className="text-xs font-medium uppercase text-ink-subtle">Domínios</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {site.domains.map((d) => (
-                    <span key={d} className="rounded-full bg-surface-subtle px-2.5 py-1 text-xs text-ink-muted">{d}</span>
-                  ))}
-                </div>
+            </div>
+            <div className="mt-4">
+              <p className="text-xs font-medium uppercase text-ink-subtle">Domínios</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {site.domains.map((d) => (
+                  <span key={d} className="rounded-full bg-surface-subtle px-2.5 py-1 text-xs text-ink-muted">{d}</span>
+                ))}
               </div>
-            </Card>
-          );
-        })}
+            </div>
+          </Card>
+        ))}
       </div>
     </div>
   );

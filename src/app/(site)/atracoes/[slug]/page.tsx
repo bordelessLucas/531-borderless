@@ -19,19 +19,19 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const site = await getCurrentSite();
-  const product = getProductBySlug(slug, site);
+  const product = await getProductBySlug(slug, site);
   return { title: product?.name ?? "Atração" };
 }
 
 export default async function AtracaoPage({ params }: PageProps) {
   const { slug } = await params;
   const site = await getCurrentSite();
-  const product = getProductBySlug(slug, site);
+  const product = await getProductBySlug(slug, site);
   if (!product || product.type !== "SIMPLE" || !product.attractionId) notFound();
 
-  const attraction = getAttractionById(product.attractionId);
+  const attraction = await getAttractionById(product.attractionId);
   if (!attraction) notFound();
-  const ticketTypes = getTicketTypesByAttraction(attraction.id);
+  const ticketTypes = await getTicketTypesByAttraction(attraction.id);
 
   return (
     <div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Building2,
   LayoutDashboard,
@@ -9,8 +9,10 @@ import {
   Ticket,
   Inbox,
   Globe,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/features/auth/auth-provider";
 
 const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -23,6 +25,15 @@ const nav = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
+  async function onLogout() {
+    await logout();
+    router.replace("/login");
+    router.refresh();
+  }
+
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-surface-border bg-surface px-4 py-6 lg:block">
       <Link href="/admin" className="flex items-center gap-2 px-2">
@@ -52,9 +63,21 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      <Link href="/" className="mt-8 block px-3 text-xs text-ink-subtle hover:text-ink">
-        ← Ver site
-      </Link>
+      <div className="mt-8 space-y-2 px-3">
+        {user?.email ? (
+          <p className="truncate text-xs text-ink-subtle">{user.email}</p>
+        ) : null}
+        <button
+          type="button"
+          onClick={() => void onLogout()}
+          className="flex items-center gap-2 text-xs text-ink-muted hover:text-ink"
+        >
+          <LogOut className="h-3.5 w-3.5" /> Sair
+        </button>
+        <Link href="/" className="block text-xs text-ink-subtle hover:text-ink">
+          ← Ver site
+        </Link>
+      </div>
     </aside>
   );
 }

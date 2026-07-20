@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Atrações" };
 
 export default async function AtracoesPage() {
   const site = await getCurrentSite();
-  const attractions = listProductsForSite(site).filter((p) => p.type === "SIMPLE");
+  const attractions = (await listProductsForSite(site)).filter((p) => p.type === "SIMPLE");
 
   return (
     <div className="container py-12">

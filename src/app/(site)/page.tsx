@@ -14,7 +14,7 @@ const perks = [
 
 export default async function HomePage() {
   const site = await getCurrentSite();
-  const products = listProductsForSite(site);
+  const products = await listProductsForSite(site);
   const passport = products.find((p) => p.type === "PASSPORT");
   const attractions = products.filter((p) => p.type === "SIMPLE");
 

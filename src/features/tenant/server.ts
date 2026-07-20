@@ -11,7 +11,7 @@ import type { Site } from "@/features/tenant/types";
 export async function getCurrentSite(): Promise<Site> {
   const headerList = await headers();
   const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
-  return getSiteByHost(host);
+  return await getSiteByHost(host);
 }
 
 /** CSS variables inline para aplicar o tema do tenant no <html>. */

@@ -1,8 +1,8 @@
 import { listPartners } from "@/lib/repository";
 import { Card } from "@/components/ui/card";
 
-export default function AdminParceirosPage() {
-  const partners = listPartners();
+export default async function AdminParceirosPage() {
+  const partners = await listPartners();
 
   return (
     <div>

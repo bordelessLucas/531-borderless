@@ -1,9 +1,14 @@
+"use client";
+
 import Link from "next/link";
-import { MapPin, Ticket } from "lucide-react";
+import { MapPin, Ticket, User } from "lucide-react";
 import type { Site } from "@/features/tenant/types";
+import { useAuth } from "@/features/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader({ site }: { site: Site }) {
+  const { user, isStaff, isLoading, logout } = useAuth();
+
   return (
     <header className="sticky top-0 z-40 border-b border-surface-border bg-surface/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
@@ -24,10 +29,34 @@ export function SiteHeader({ site }: { site: Site }) {
           </span>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <Link href="/passaportes">
-            <Button size="sm">Explorar passaportes</Button>
-          </Link>
+        <div className="flex items-center gap-2 sm:gap-3">
+          {!isLoading && user ? (
+            <>
+              <Link href="/conta">
+                <Button size="sm" variant="ghost">
+                  <User className="h-4 w-4" />
+                  Conta
+                </Button>
+              </Link>
+              {isStaff ? (
+                <Link href="/admin" className="hidden sm:block">
+                  <Button size="sm" variant="outline">Admin</Button>
+                </Link>
+              ) : null}
+              <Button size="sm" variant="outline" onClick={() => void logout()}>
+                Sair
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button size="sm" variant="ghost">Entrar</Button>
+              </Link>
+              <Link href="/passaportes">
+                <Button size="sm">Explorar passaportes</Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

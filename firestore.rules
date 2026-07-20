@@ -3,40 +3,110 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Papéis via custom claims no token: admin, operator (backoffice), ou cliente.
     function isSignedIn() {
       return request.auth != null;
     }
-    function isAdmin() {
-      return isSignedIn() && request.auth.token.role == 'admin';
-    }
-    function isStaff() {
-      return isSignedIn() && request.auth.token.role in ['admin', 'operator'];
+
+    function userDocPath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
     }
 
-    // Catálogo público: leitura liberada, escrita só para staff.
+    function userDocExists() {
+      return isSignedIn() && exists(userDocPath());
+    }
+
+    function roleFromDb() {
+      return get(userDocPath()).data.role;
+    }
+
+    function staffConfigExists() {
+      return exists(/databases/$(database)/documents/config/staff);
+    }
+
+    function staffConfig() {
+      return get(/databases/$(database)/documents/config/staff).data;
+    }
+
+    function emailOnAdminList() {
+      return isSignedIn()
+        && request.auth.token.email != null
+        && staffConfigExists()
+        && request.auth.token.email in staffConfig().adminEmails;
+    }
+
+    function emailOnOperatorList() {
+      return isSignedIn()
+        && request.auth.token.email != null
+        && staffConfigExists()
+        && request.auth.token.email in staffConfig().operatorEmails;
+    }
+
+    // Claims (Admin SDK) OU doc users/ OU allowlist em config/staff (Spark, sem Functions).
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.role == 'admin' ||
+        (userDocExists() && roleFromDb() == 'admin') ||
+        emailOnAdminList()
+      );
+    }
+
+    function isStaff() {
+      return isSignedIn() && (
+        request.auth.token.role in ['admin', 'operator'] ||
+        (userDocExists() && roleFromDb() in ['admin', 'operator']) ||
+        emailOnAdminList() ||
+        emailOnOperatorList()
+      );
+    }
+
+    match /config/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /sites/{id}      { allow read; allow write: if isAdmin(); }
-    match /partners/{id}   { allow read: if isStaff(); allow write: if isAdmin(); }
+    match /partners/{id}   { allow read; allow write: if isAdmin(); }
     match /attractions/{id}{ allow read; allow write: if isStaff(); }
     match /ticketTypes/{id}{ allow read; allow write: if isStaff(); }
     match /products/{id}   { allow read; allow write: if isStaff(); }
 
-    // Pedidos: cliente lê os próprios; staff lê/gerencia todos.
     match /orders/{id} {
-      allow read: if isStaff() || (isSignedIn() && resource.data.customerUid == request.auth.uid);
-      allow create: if isSignedIn();
+      allow read: if isStaff()
+        || (isSignedIn() && resource.data.customerUid == request.auth.uid)
+        || (isSignedIn()
+            && request.auth.token.email != null
+            && resource.data.customer.email == request.auth.token.email);
+      allow create: if isSignedIn()
+        && request.resource.data.customerUid == request.auth.uid;
       allow update, delete: if isStaff();
     }
 
-    // Emissões: apenas backoffice (dados sensíveis do cliente/parceiro).
     match /fulfillments/{id} {
-      allow read, write: if isStaff();
+      allow read: if isStaff()
+        || (isSignedIn()
+            && exists(/databases/$(database)/documents/orders/$(resource.data.orderId))
+            && (
+              get(/databases/$(database)/documents/orders/$(resource.data.orderId)).data.customerUid
+                == request.auth.uid
+              || (
+                request.auth.token.email != null
+                && get(/databases/$(database)/documents/orders/$(resource.data.orderId)).data.customer.email
+                  == request.auth.token.email
+              )
+            ));
+      allow write: if isStaff();
     }
 
-    // Perfis de usuário.
     match /users/{uid} {
-      allow read, write: if isSignedIn() && request.auth.uid == uid;
-      allow read: if isAdmin();
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if isSignedIn()
+        && request.auth.uid == uid
+        && request.resource.data.role == 'customer';
+      allow update: if isAdmin()
+        || (isSignedIn()
+            && request.auth.uid == uid
+            && request.resource.data.role == resource.data.role);
+      allow delete: if isAdmin();
     }
   }
 }

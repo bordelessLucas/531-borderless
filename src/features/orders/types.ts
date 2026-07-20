@@ -56,6 +56,8 @@ export interface PaymentRef {
 export interface Order extends Timestamps {
   id: ID;
   siteId: ID;
+  /** Firebase Auth uid do comprador (obrigatório para área /conta). */
+  customerUid?: string;
   status: OrderStatus;
   customer: Customer;
   items: OrderItem[];

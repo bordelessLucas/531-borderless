@@ -4,13 +4,18 @@ Lista numerada por prioridade sugerida (do bloqueante ao evolutivo).
 
 ## Fundação & dados
 
-1. Criar/selecionar projeto Firebase real e autenticar (`firebase login` + `use <PROJECT_ID>`)
-2. Preencher `.env.local` com a config Web do Firebase (`apps:sdkconfig WEB`)
-3. Subir emuladores locais e popular com seed (`npm run emulators` + `npm run seed`)
-4. Migrar `src/lib/repository.ts` do seed estático para queries reais no Firestore
-5. Implementar Auth (email/senha e/ou Google) com custom claims (`admin`, `operator`, cliente)
-6. Proteger rotas `/admin/*` (middleware) — só staff autenticado
-7. Área do cliente: login, meus pedidos e download de bilhetes
+1. ~~Criar/selecionar projeto Firebase real e autenticar (`firebase login` + `use <PROJECT_ID>`)~~ — feito: `gustavo-c049a`
+2. ~~Preencher `.env.local` com a config Web do Firebase (`apps:sdkconfig WEB`)~~ — feito
+3. ~~Subir emuladores locais e popular com seed (`npm run emulators` + `npm run seed`)~~ — seed no projeto real via `npm run seed` (sem Functions; bootstrap temporário de rules)
+4. ~~Migrar `src/lib/repository.ts` do seed estático para queries reais no Firestore~~
+5. ~~Implementar Auth (email/senha e/ou Google) com custom claims (`admin`, `operator`, cliente)~~ — allowlist `ADMIN_EMAILS` + `config/staff` (Spark, sem Functions); claims opcionais com SA
+6. ~~Proteger rotas `/admin/*` (middleware) — só staff autenticado~~
+7. ~~Área do cliente: login, meus pedidos e download de bilhetes~~
+
+> **Nota Spark (sem Blaze):** Auth + sessão via ID token (JWKS), sem Cloud Functions.
+> Staff = `ADMIN_EMAILS` / `OPERATOR_EMAILS` + doc `config/staff`. Para espelhar role no
+> `users/{uid}`: `npm run promote-admin -- --uid=<UID> --role=admin`.
+> Ative **E-mail/Senha** e **Google** em Authentication no Console Firebase.
 
 ## Pagamento
 

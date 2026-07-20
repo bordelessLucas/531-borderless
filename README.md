@@ -59,23 +59,17 @@ cp .env.local.example .env.local
 npm run dev            # http://localhost:3000  (storefront)  |  /admin (backoffice)
 ```
 
-O protótipo roda com **dados de seed** (sem backend). Para conectar o Firebase:
+Depois do `.env.local` preenchido (sem Cloud Functions / plano Blaze):
 
 ```bash
-# 1) Autenticar e selecionar/criar o projeto
-npx -y firebase-tools@latest login
-npx -y firebase-tools@latest use <PROJECT_ID>
-
-# 2) Emulador local + seed
-npm run emulators
-FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 npm run seed
-
-# 3) Preencher .env.local com a config Web:
-npx -y firebase-tools@latest apps:sdkconfig WEB
+npm run seed            # bootstrap rules → grava catálogo → restaura rules
+npm run firebase:rules  # só rules (firestore + storage), se precisar
+npm run dev
 ```
 
-Depois, migrar `src/lib/repository.ts` do seed para queries do Firestore
-(as páginas não mudam).
+A camada `src/lib/repository.ts` lê o Firestore real (Client SDK no servidor).
+Sem service account e sem Auth, a escrita no CMS admin ainda não persiste —
+isso entra no bloco de Auth (itens 5–6).
 
 ## Papéis e segurança
 

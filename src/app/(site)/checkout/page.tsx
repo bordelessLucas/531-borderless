@@ -23,7 +23,7 @@ export default async function CheckoutPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const site = await getCurrentSite();
   const productSlug = typeof sp.product === "string" ? sp.product : "";
-  const product = productSlug ? getProductBySlug(productSlug, site) : null;
+  const product = productSlug ? await getProductBySlug(productSlug, site) : null;
 
   const lines: CheckoutLine[] = [];
 
@@ -41,7 +41,7 @@ export default async function CheckoutPage({ searchParams }: PageProps) {
     const detail = [date, slot].filter(Boolean).join(" · ") || "Data livre";
     for (const entry of asArray(sp.tt)) {
       const [id, qtyRaw] = entry.split(":");
-      const ticketType = id ? getTicketTypeById(id) : null;
+      const ticketType = id ? await getTicketTypeById(id) : null;
       const quantity = Number(qtyRaw) || 0;
       if (ticketType && quantity > 0) {
         lines.push({ label: ticketType.name, detail, quantity, unitPrice: ticketType.price });

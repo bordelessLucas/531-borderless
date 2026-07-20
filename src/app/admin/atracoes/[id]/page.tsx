@@ -11,9 +11,9 @@ interface PageProps {
 export default async function AttractionEditorPage({ params }: PageProps) {
   const { id } = await params;
   const isNew = id === "nova";
-  const attraction = isNew ? null : getAttractionById(id);
+  const attraction = isNew ? null : await getAttractionById(id);
   if (!isNew && !attraction) notFound();
-  const partners = listPartners();
+  const partners = await listPartners();
 
   return (
     <div>

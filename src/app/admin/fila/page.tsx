@@ -1,8 +1,6 @@
-import { listManualFulfillments } from "@/lib/repository";
-import { FulfillmentQueue } from "@/components/admin/fulfillment-queue";
+import { AdminQueueLoader } from "@/components/admin/admin-queue-loader";
 
 export default function FilaPage() {
-  const items = listManualFulfillments();
   return (
     <div>
       <header className="mb-8">
@@ -11,7 +9,7 @@ export default function FilaPage() {
           Atrativos sem integração: emita no portal do parceiro e anexe os bilhetes ao pedido.
         </p>
       </header>
-      <FulfillmentQueue items={items} />
+      <AdminQueueLoader />
     </div>
   );
 }

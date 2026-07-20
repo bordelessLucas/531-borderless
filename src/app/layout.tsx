@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { getCurrentSite, siteThemeVars } from "@/features/tenant/server";
+import { getServerSession } from "@/features/auth/server";
+import { AuthProvider } from "@/features/auth/auth-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-display", display: "swap" });
@@ -15,10 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const site = await getCurrentSite();
+  const [site, session] = await Promise.all([getCurrentSite(), getServerSession()]);
   return (
     <html lang="pt-BR" style={siteThemeVars(site)} className={`${inter.variable} ${fraunces.variable}`}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <AuthProvider initialRole={session?.role ?? null}>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Passaportes" };
 
 export default async function PassaportesPage() {
   const site = await getCurrentSite();
-  const passports = listProductsForSite(site).filter((p) => p.type === "PASSPORT");
+  const passports = (await listProductsForSite(site)).filter((p) => p.type === "PASSPORT");
 
   return (
     <div className="container py-12">

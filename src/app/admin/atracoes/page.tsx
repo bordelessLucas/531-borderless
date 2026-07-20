@@ -10,8 +10,16 @@ const modeLabel: Record<string, string> = {
   OPEN: "Sem data",
 };
 
-export default function AdminAtracoesPage() {
-  const attractions = listAttractions();
+export default async function AdminAtracoesPage() {
+  const attractions = await listAttractions();
+  const partnersById = new Map(
+    await Promise.all(
+      [...new Set(attractions.map((a) => a.partnerId))].map(async (id) => {
+        const partner = await getPartnerById(id);
+        return [id, partner] as const;
+      }),
+    ),
+  );
 
   return (
     <div>
@@ -38,7 +46,7 @@ export default function AdminAtracoesPage() {
           </thead>
           <tbody className="divide-y divide-surface-border">
             {attractions.map((a) => {
-              const partner = getPartnerById(a.partnerId);
+              const partner = partnersById.get(a.partnerId);
               return (
                 <tr key={a.id} className="transition-colors hover:bg-surface-subtle">
                   <td className="px-5 py-4">

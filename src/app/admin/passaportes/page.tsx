@@ -1,12 +1,24 @@
-import Link from "next/link";
 import { Plus } from "lucide-react";
 import { getAttractionById, listAllProducts } from "@/lib/repository";
 import { formatMoney } from "@/features/shared/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export default function AdminPassaportesPage() {
-  const passports = listAllProducts().filter((p) => p.type === "PASSPORT");
+export default async function AdminPassaportesPage() {
+  const products = await listAllProducts();
+  const passports = products.filter((p) => p.type === "PASSPORT");
+
+  const compositionRows = await Promise.all(
+    passports.map(async (p) => ({
+      product: p,
+      items: await Promise.all(
+        (p.composition?.items ?? []).map(async (item) => ({
+          item,
+          attraction: await getAttractionById(item.attractionId),
+        })),
+      ),
+    })),
+  );
 
   return (
     <div>
@@ -19,7 +31,7 @@ export default function AdminPassaportesPage() {
       </header>
 
       <div className="grid gap-5 md:grid-cols-2">
-        {passports.map((p) => (
+        {compositionRows.map(({ product: p, items }) => (
           <Card key={p.id} className="p-6">
             <div className="flex items-start justify-between">
               <div>
@@ -32,17 +44,14 @@ export default function AdminPassaportesPage() {
             </div>
             <div className="mt-4 space-y-2">
               <p className="text-xs font-medium uppercase text-ink-subtle">Composição</p>
-              {p.composition?.items.map((item) => {
-                const attraction = getAttractionById(item.attractionId);
-                return (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg bg-surface-subtle px-3 py-2 text-sm">
-                    <span className="text-ink">{attraction?.name ?? item.attractionId}</span>
-                    <span className="text-xs text-ink-subtle">
-                      {item.quantity}x · {item.required ? "obrigatório" : "opcional"}
-                    </span>
-                  </div>
-                );
-              })}
+              {items.map(({ item, attraction }) => (
+                <div key={item.id} className="flex items-center justify-between rounded-lg bg-surface-subtle px-3 py-2 text-sm">
+                  <span className="text-ink">{attraction?.name ?? item.attractionId}</span>
+                  <span className="text-xs text-ink-subtle">
+                    {item.quantity}x · {item.required ? "obrigatório" : "opcional"}
+                  </span>
+                </div>
+              ))}
             </div>
           </Card>
         ))}

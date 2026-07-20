@@ -32,28 +32,31 @@ const strategyLabel: Record<FulfillmentStrategy, { icon: typeof Cpu; label: stri
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const site = await getCurrentSite();
-  const product = getProductBySlug(slug, site);
+  const product = await getProductBySlug(slug, site);
   return { title: product?.name ?? "Passaporte" };
 }
 
 export default async function PassaportePage({ params }: PageProps) {
   const { slug } = await params;
   const site = await getCurrentSite();
-  const product = getProductBySlug(slug, site);
+  const product = await getProductBySlug(slug, site);
   if (!product || product.type !== "PASSPORT" || !product.composition) notFound();
 
-  const items = product.composition.items
-    .slice()
-    .sort((a, b) => a.order - b.order)
-    .map((item) => {
-      const attraction = getAttractionById(item.attractionId);
-      const ticketType = getTicketTypeById(item.ticketTypeId);
-      const partner = attraction ? getPartnerById(attraction.partnerId) : null;
-      const strategy: FulfillmentStrategy =
-        ticketType?.strategy ?? partner?.defaultStrategy ?? "MANUAL";
-      return { item, attraction, ticketType, strategy };
-    })
-    .filter((x) => x.attraction && x.ticketType);
+  const items = (
+    await Promise.all(
+      product.composition.items
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map(async (item) => {
+          const attraction = await getAttractionById(item.attractionId);
+          const ticketType = await getTicketTypeById(item.ticketTypeId);
+          const partner = attraction ? await getPartnerById(attraction.partnerId) : null;
+          const strategy: FulfillmentStrategy =
+            ticketType?.strategy ?? partner?.defaultStrategy ?? "MANUAL";
+          return { item, attraction, ticketType, strategy };
+        }),
+    )
+  ).filter((x) => x.attraction && x.ticketType);
 
   return (
     <div>
