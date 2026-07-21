@@ -119,11 +119,26 @@ export async function getAttractionBySlug(slug: string): Promise<Attraction | nu
 export async function getTicketTypesByAttraction(
   attractionId: string,
 ): Promise<TicketType[]> {
-  const rows = await listAll<TicketType>(
+  const rows = await listTicketTypesByAttractionAdmin(attractionId);
+  return rows.filter((t) => t.isActive);
+}
+
+/** Admin: inclui categorias inativas. */
+export async function listTicketTypesByAttractionAdmin(
+  attractionId: string,
+): Promise<TicketType[]> {
+  return listAll<TicketType>(
     COLLECTIONS.ticketTypes,
     where("attractionId", "==", attractionId),
   );
-  return rows.filter((t) => t.isActive);
+}
+
+export async function listAllAttractions(): Promise<Attraction[]> {
+  return listAll<Attraction>(COLLECTIONS.attractions);
+}
+
+export async function listAllTicketTypes(): Promise<TicketType[]> {
+  return listAll<TicketType>(COLLECTIONS.ticketTypes);
 }
 
 export async function getTicketTypeById(id: string): Promise<TicketType | null> {

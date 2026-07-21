@@ -10,6 +10,7 @@ import {
   Inbox,
   Globe,
   LogOut,
+  ShoppingBag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/auth-provider";
@@ -17,6 +18,7 @@ import { useAuth } from "@/features/auth/auth-provider";
 const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/fila", label: "Fila de emissão", icon: Inbox },
+  { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   { href: "/admin/atracoes", label: "Atrações", icon: MapPinned },
   { href: "/admin/passaportes", label: "Passaportes", icon: Ticket },
   { href: "/admin/parceiros", label: "Parceiros", icon: Building2 },

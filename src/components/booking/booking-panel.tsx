@@ -4,6 +4,10 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus } from "lucide-react";
 import type { AvailabilityPolicy, TicketType } from "@/features/attractions/types";
+import {
+  listAvailableDays,
+  slotsForDate,
+} from "@/features/attractions/availability";
 import { formatMoney, money } from "@/features/shared/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,24 +19,16 @@ interface BookingPanelProps {
   availability: AvailabilityPolicy;
 }
 
-function nextDates(days: number): { iso: string; label: string }[] {
-  const out: { iso: string; label: string }[] = [];
-  const today = new Date();
-  for (let i = 1; i <= days; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    out.push({
-      iso: d.toISOString().slice(0, 10),
-      label: d.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short" }),
-    });
-  }
-  return out;
-}
-
 export function BookingPanel({ productSlug, ticketTypes, availability }: BookingPanelProps) {
-  const dates = useMemo(() => nextDates(10), []);
-  const [date, setDate] = useState<string>(availability.mode === "OPEN" ? "" : dates[0]!.iso);
-  const [slot, setSlot] = useState<string>(availability.defaultSlots[0]?.start ?? "");
+  const dates = useMemo(() => listAvailableDays(availability, 14), [availability]);
+  const [date, setDate] = useState<string>(
+    availability.mode === "OPEN" ? "" : dates[0]?.iso ?? "",
+  );
+  const slots = useMemo(
+    () => (date ? slotsForDate(availability, date) : availability.defaultSlots),
+    [availability, date],
+  );
+  const [slot, setSlot] = useState<string>(slots[0]?.start ?? "");
   const [qty, setQty] = useState<Record<string, number>>({});
 
   const setQuantity = (id: string, delta: number, max: number) =>
@@ -64,22 +60,33 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
       {availability.mode !== "OPEN" ? (
         <div>
           <p className="text-sm font-semibold text-ink">Escolha a data</p>
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
-            {dates.map((d) => (
-              <button
-                key={d.iso}
-                onClick={() => setDate(d.iso)}
-                className={cn(
-                  "shrink-0 rounded-xl border px-3 py-2 text-center text-xs capitalize transition-colors",
-                  date === d.iso
-                    ? "border-brand bg-brand text-brand-fg"
-                    : "border-surface-border text-ink-muted hover:border-brand",
-                )}
-              >
-                {d.label}
-              </button>
-            ))}
-          </div>
+          {dates.length === 0 ? (
+            <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              Nenhuma data disponível no momento (calendário/lead time).
+            </p>
+          ) : (
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+              {dates.map((d) => (
+                <button
+                  key={d.iso}
+                  type="button"
+                  onClick={() => {
+                    setDate(d.iso);
+                    const nextSlots = slotsForDate(availability, d.iso);
+                    setSlot(nextSlots[0]?.start ?? "");
+                  }}
+                  className={cn(
+                    "shrink-0 rounded-xl border px-3 py-2 text-center text-xs capitalize transition-colors",
+                    date === d.iso
+                      ? "border-brand bg-brand text-brand-fg"
+                      : "border-surface-border text-ink-muted hover:border-brand",
+                  )}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         <p className="rounded-xl bg-surface-subtle px-4 py-3 text-sm text-ink-muted">
@@ -87,13 +94,14 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
         </p>
       )}
 
-      {availability.mode === "SCHEDULED" && availability.defaultSlots.length > 0 ? (
+      {availability.mode === "SCHEDULED" && slots.length > 0 ? (
         <div className="mt-5">
           <p className="text-sm font-semibold text-ink">Horário</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {availability.defaultSlots.map((s) => (
+            {slots.map((s) => (
               <button
                 key={s.start}
+                type="button"
                 onClick={() => setSlot(s.start)}
                 className={cn(
                   "rounded-lg border px-3 py-1.5 text-sm transition-colors",
@@ -119,6 +127,7 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
             </div>
             <div className="flex items-center gap-3">
               <button
+                type="button"
                 onClick={() => setQuantity(tt.id, -1, tt.maxPerOrder)}
                 className="flex h-8 w-8 items-center justify-center rounded-full border border-surface-border text-ink-muted transition-colors hover:border-brand disabled:opacity-40"
                 disabled={(qty[tt.id] ?? 0) === 0}
@@ -128,6 +137,7 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
               </button>
               <span className="w-5 text-center text-sm font-medium">{qty[tt.id] ?? 0}</span>
               <button
+                type="button"
                 onClick={() => setQuantity(tt.id, 1, tt.maxPerOrder)}
                 className="flex h-8 w-8 items-center justify-center rounded-full border border-surface-border text-ink-muted transition-colors hover:border-brand"
                 aria-label={`Adicionar ${tt.name}`}

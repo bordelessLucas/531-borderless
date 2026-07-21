@@ -25,6 +25,9 @@ export default async function CheckoutPage({ searchParams }: PageProps) {
   const productSlug = typeof sp.product === "string" ? sp.product : "";
   const product = productSlug ? await getProductBySlug(productSlug, site) : null;
 
+  const visitDate = typeof sp.date === "string" && sp.date ? sp.date : null;
+  const visitSlot = typeof sp.slot === "string" && sp.slot ? sp.slot : null;
+
   const lines: CheckoutLine[] = [];
 
   if (product?.type === "PASSPORT") {
@@ -36,15 +39,19 @@ export default async function CheckoutPage({ searchParams }: PageProps) {
       unitPrice: product.passportPrice ?? product.fromPrice,
     });
   } else if (product?.type === "SIMPLE") {
-    const date = typeof sp.date === "string" ? sp.date : "";
-    const slot = typeof sp.slot === "string" ? sp.slot : "";
-    const detail = [date, slot].filter(Boolean).join(" · ") || "Data livre";
+    const detail = [visitDate, visitSlot].filter(Boolean).join(" · ") || "Data livre";
     for (const entry of asArray(sp.tt)) {
       const [id, qtyRaw] = entry.split(":");
       const ticketType = id ? await getTicketTypeById(id) : null;
       const quantity = Number(qtyRaw) || 0;
       if (ticketType && quantity > 0) {
-        lines.push({ label: ticketType.name, detail, quantity, unitPrice: ticketType.price });
+        lines.push({
+          label: ticketType.name,
+          detail,
+          quantity,
+          unitPrice: ticketType.price,
+          ticketTypeId: ticketType.id,
+        });
       }
     }
   }
@@ -64,7 +71,14 @@ export default async function CheckoutPage({ searchParams }: PageProps) {
   return (
     <div className="container py-12">
       <h1 className="mb-8 font-display text-3xl font-semibold text-ink">Finalizar compra</h1>
-      <CheckoutForm lines={lines} total={total} />
+      <CheckoutForm
+        lines={lines}
+        total={total}
+        siteId={site.id}
+        product={product}
+        visitDate={visitDate}
+        visitSlot={visitSlot}
+      />
     </div>
   );
 }

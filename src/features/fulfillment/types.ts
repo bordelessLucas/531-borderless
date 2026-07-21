@@ -43,6 +43,8 @@ export interface Fulfillment extends Timestamps {
   orderId: ID;
   orderItemId: ID;
   siteId: ID;
+  /** Dono do pedido — permite create no batch sem get() do order. */
+  customerUid?: string;
   partnerId: ID;
   attractionId: ID;
   ticketTypeId: ID;

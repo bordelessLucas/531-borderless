@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { getPartnerById, listAttractions } from "@/lib/repository";
+import { getPartnerById, listAllAttractions } from "@/lib/repository";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -11,7 +11,7 @@ const modeLabel: Record<string, string> = {
 };
 
 export default async function AdminAtracoesPage() {
-  const attractions = await listAttractions();
+  const attractions = await listAllAttractions();
   const partnersById = new Map(
     await Promise.all(
       [...new Set(attractions.map((a) => a.partnerId))].map(async (id) => {

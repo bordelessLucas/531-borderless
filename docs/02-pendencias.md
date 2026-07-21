@@ -22,15 +22,15 @@ Lista numerada por prioridade sugerida (do bloqueante ao evolutivo).
 8. Definir gateway (Pagar.me, Stripe ou Mercado Pago)
 9. Implementar provider concreto atrás de `PaymentRef` (Pix + cartão)
 10. Webhook de confirmação de pagamento → transição `AWAITING_PAYMENT` → `PAID`
-11. Persistência real do pedido no Firestore no checkout (hoje é mock client-side)
+11. ~~Persistência real do pedido no Firestore no checkout~~ — `placeOrder` + orquestração de fulfillments (pagamento mock)
 12. Fluxo de cancelamento/reembolso e estorno parcial
 
 ## Catálogo & CMS (completar)
 
-13. CRUD completo de `TicketType` (categorias, preço, SKU do parceiro, strategy)
-14. Editor de calendário: slots, temporadas, blackouts, lead time, validade
-15. Editor de conteúdo rico (blocos: parágrafo, heading, bullets, imagem, FAQ) com upload no Storage
-16. Editor de passaporte: composição de atrações, itens obrigatórios/opcionais, preço fechado
+13. ~~CRUD completo de `TicketType` (categorias, preço, SKU do parceiro, strategy)~~
+14. ~~Editor de calendário: slots, temporadas, blackouts, lead time, validade~~
+15. ~~Editor de conteúdo rico (blocos)~~ — editor de blocos com URL de imagem; upload Storage CMS pendente
+16. ~~Editor de passaporte: composição, obrigatórios/opcionais, preço fechado~~
 17. CRUD de parceiros (integração, comissão, estratégia padrão)
 18. CRUD de sites (domínios, tema, recorte de catálogo, branding)
 19. Publicação/rascunho/arquivo com preview por site
@@ -38,16 +38,16 @@ Lista numerada por prioridade sugerida (do bloqueante ao evolutivo).
 
 ## Disponibilidade
 
-21. Motor de disponibilidade real (interseção de calendários para passaporte)
+21. ~~Motor de disponibilidade real~~ — datas/slots por atração (weekdays, blackouts, lead time, temporada); interseção de passaporte ainda parcial
 22. Consulta de cotas/capacidade por data e horário
 23. Integração do adapter de API com `checkAvailability` em tempo real
 24. Bloqueio de overbooking e reserva temporária no checkout (hold)
 
 ## Fulfillment (operação)
 
-25. Orquestrador: ao pagar, explode `OrderItem` em N `Fulfillments`
-26. Disparo automático dos adapters `API` e enfileiramento dos `MANUAL`
-27. Fila manual funcional: upload real de PDF no Storage + marcar `ISSUED`
+25. ~~Orquestrador: ao pagar, explode `OrderItem` em N `Fulfillments`~~
+26. Disparo automático dos adapters `API` e enfileiramento dos `MANUAL` — MANUAL na fila; API ainda stub
+27. ~~Fila manual funcional: upload real de PDF no Storage + marcar `ISSUED`~~
 28. E-mail automático ao cliente quando todos os fulfillments estiverem `ISSUED`/`DELIVERED`
 29. Retry, dead-letter e alerta de falha (`FAILED`) para a operação
 30. Cancelamento de bilhete via adapter (`cancel`) quando houver reembolso
@@ -69,7 +69,7 @@ Lista numerada por prioridade sugerida (do bloqueante ao evolutivo).
 
 ## Backoffice operacional
 
-40. Listagem e detalhe de pedidos (filtro por status, site, parceiro, data)
+40. ~~Listagem e detalhe de pedidos (filtro por status, site, parceiro, data)~~ — listagem + filtros básicos
 41. CRM leve: histórico do cliente, contatos, observações internas
 42. Métricas e relatórios (vendas, conversão, taxa de emissão manual, SLA da fila)
 43. Notificações internas (novos itens na fila, falhas de API)
@@ -95,4 +95,9 @@ Lista numerada por prioridade sugerida (do bloqueante ao evolutivo).
 
 ---
 
-**Sugestão de próximo bloco (MVP operacional):** itens **1–6**, **8–11**, **13–16**, **25–28**.
+**Sugestão de próximo bloco:** gateway de pagamento (**8–10**), e-mail pós-emissão (**28**), CRUD parceiros/sites (**17–18**), adapter API piloto (**31**).
+
+**Ops manuais agora:**
+- Publicar rules: `npm run firebase:rules`
+- Ativar **Storage** no Console Firebase (upload de bilhetes)
+- Confirmar providers Auth (E-mail/Senha + Google)

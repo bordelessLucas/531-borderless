@@ -114,5 +114,54 @@
 
 ### Pendência manual (Console Firebase)
 
-- [ ] Ativar providers **E-mail/Senha** e **Google** em Authentication
-- [ ] (Opcional) Ativar Storage quando for upload de bilhetes
+- [ ] Ativar providers **E-mail/Senha** e **Google** em Authentication (se ainda não)
+- [ ] Ativar **Storage** no Console (necessário para upload de PDF na fila)
+
+---
+
+## Sessão — MVP operacional (21/07/2026)
+
+### Checkout + pedidos reais (itens 11, 25)
+
+- [x] Persistência de `Order` no Firestore no checkout (`placeOrder`)
+- [x] Pagamento mock (`provider: "mock"`, status `PAID`) — sem gateway ainda
+- [x] Login obrigatório para finalizar compra
+- [x] Orquestrador: explode itens em N `Fulfillments` (SIMPLE e PASSPORT)
+- [x] `customerUid` no fulfillment para create no batch (Spark, sem Admin SDK)
+- [x] Strip de campos `undefined` (ex.: CPF opcional) antes do write
+- [x] Tela de sucesso com link para `/conta/pedidos/[id]`
+
+### Fila manual (item 27)
+
+- [x] Upload de PDF/imagem no Storage (`tickets/{orderId}/…`)
+- [x] Marcar fulfillment como `ISSUED` + `ticketAssets` + `handledByUid`
+- [x] UI da fila ligada às ações reais (não só mock visual)
+- [x] `storage.rules` alinhadas a staff via `config/staff` / `users/{uid}`
+
+### CMS / catálogo (itens 13–16)
+
+- [x] CRUD de `TicketType` (preço, SKU, strategy, max, ativo/inativo)
+- [x] Editor de calendário: modo, weekdays, slots, blackouts, temporadas, lead time
+- [x] Editor de conteúdo rico (parágrafo, heading, bullets, imagem URL, FAQ)
+- [x] Editor de passaporte: composição, obrigatório/opcional, preço, publicação
+- [x] Writes de staff via Client SDK autenticado (`staff-writes.ts`)
+
+### Disponibilidade + backoffice (itens 21, 40)
+
+- [x] Motor de disponibilidade (`listAvailableDays` / `slotsForDate`) no booking panel
+- [x] Listagem admin de pedidos (`/admin/pedidos`) com busca e filtro por status
+- [x] Item “Pedidos” na sidebar do admin
+
+### Rules / ops
+
+- [x] Rules de `fulfillments` create por `customerUid` (sem depender de get do order no batch)
+- [x] Deploy das rules Firestore em `gustavo-c049a`
+- [x] `docs/02-pendencias.md` atualizado (itens feitos riscados)
+
+### Ainda pendente (manual / próximo bloco)
+
+- [ ] Ativar Storage no Console Firebase
+- [ ] Gateway real (itens 8–10)
+- [ ] E-mail automático pós-emissão (item 28)
+- [ ] CRUD parceiros / sites (itens 17–18)
+- [ ] Adapter API real (item 31)
