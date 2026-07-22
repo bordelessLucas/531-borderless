@@ -89,6 +89,10 @@ export async function listSites(): Promise<Site[]> {
   return listAll<Site>(COLLECTIONS.sites);
 }
 
+export async function getSiteById(id: string): Promise<Site | null> {
+  return getById<Site>(COLLECTIONS.sites, id);
+}
+
 export async function listPartners(): Promise<Partner[]> {
   return listAll<Partner>(COLLECTIONS.partners);
 }

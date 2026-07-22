@@ -158,10 +158,32 @@
 - [x] Deploy das rules Firestore em `gustavo-c049a`
 - [x] `docs/02-pendencias.md` atualizado (itens feitos riscados)
 
+### Sessão — CRUD parceiros / sites (22/07/2026)
+
+- [x] `savePartner` + editor (`/admin/parceiros`, `/admin/parceiros/[id]`)
+- [x] Campos: estratégia, adapter, config, comissão (bps), ativo
+- [x] `saveSite` + editor (`/admin/sites`, `/admin/sites/[id]`)
+- [x] Campos: domínios, tema RGB, logo/favicon, recorte de catálogo, parceiro, status
+- [x] Write restrito a `isAdmin()` (rules já existentes)
+
+### Sessão — Identidade visual OneRio (22/07/2026)
+
+- [x] Paleta oficial no CSS/Tailwind (Noite Fresca, Rota Quente, Luz do Dia, Solo Nativo + secundárias)
+- [x] Tipografia Chillax + Satoshi self-hosted (`public/fonts`)
+- [x] Tokens em `src/features/tenant/brand.ts` + seed do site OneRio
+- [x] Header/footer/home alinhados à marca; `BrandMark` (wordmark até logo oficial)
+- [ ] Anexar arquivos oficiais do logo horizontal + ícone (SVG/PNG) no site
+
+### Sessão — Livro da Voz OneRio (22/07/2026)
+
+- [x] Módulo `src/features/tenant/voice.ts` (tom Facilitadora–Curadora, CTAs, pilares)
+- [x] Copy do storefront: home, header, footer, atrações, passaportes, checkout, auth, conta
+- [x] Metadata SEO alinhada à proposta (organizar / antecipar / clareza)
+- [x] CTAs sem urgência artificial (“Organize”, “Garantir com antecedência”, “Confirmar pedido”)
+
 ### Ainda pendente (manual / próximo bloco)
 
 - [ ] Ativar Storage no Console Firebase
 - [ ] Gateway real (itens 8–10)
 - [ ] E-mail automático pós-emissão (item 28)
-- [ ] CRUD parceiros / sites (itens 17–18)
 - [ ] Adapter API real (item 31)

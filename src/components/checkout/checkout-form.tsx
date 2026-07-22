@@ -10,6 +10,7 @@ import {
   type CheckoutTicketLine,
 } from "@/features/orders/place-order";
 import { useAuth } from "@/features/auth/auth-provider";
+import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -104,18 +105,19 @@ export function CheckoutForm({
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand/10 text-brand">
           <CheckCircle2 className="h-7 w-7" />
         </span>
-        <h2 className="mt-4 font-display text-2xl font-semibold text-ink">Pedido recebido!</h2>
+        <h2 className="mt-4 font-display text-2xl font-semibold text-ink">
+          {ONERIO_VOICE.checkout.successTitle}
+        </h2>
         <p className="mt-2 text-ink-muted">
-          Pedido <strong className="font-mono text-ink">{result.orderId.slice(0, 8)}</strong> criado.
-          Confirmação enviada para <strong>{form.email}</strong>.
+          Pedido <strong className="font-mono text-ink">{result.orderId.slice(0, 8)}</strong>.{" "}
+          {ONERIO_VOICE.checkout.successBody}
         </p>
         <p className="mx-auto mt-4 max-w-md rounded-xl bg-surface-subtle p-3 text-xs text-ink-subtle">
-          Pagamento mock (sem gateway). Os bilhetes ficam disponíveis em Minha conta assim que a
-          emissão for concluída.
+          {ONERIO_VOICE.checkout.paymentNote}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link href={`/conta/pedidos/${result.orderId}`}>
-            <Button>Ver pedido</Button>
+            <Button>{ONERIO_VOICE.cta.viewOrder}</Button>
           </Link>
           <Link href="/conta/pedidos">
             <Button variant="outline">Meus pedidos</Button>
@@ -130,16 +132,16 @@ export function CheckoutForm({
       <div className="space-y-8">
         {!authLoading && !user ? (
           <Card className="border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-            <p className="font-medium">Entre na sua conta para finalizar</p>
+            <p className="font-medium">{ONERIO_VOICE.checkout.loginPromptTitle}</p>
             <p className="mt-1 text-amber-800/80">
-              Assim o pedido aparece em Minha conta e você recebe os bilhetes.
+              {ONERIO_VOICE.checkout.loginPromptBody}
             </p>
-            <div className="mt-3 flex gap-3">
+            <div className="mt-4 flex gap-3">
               <Link href="/login">
-                <Button size="sm">Entrar</Button>
+                <Button size="md">Entrar</Button>
               </Link>
               <Link href="/registro">
-                <Button size="sm" variant="outline">
+                <Button size="md" variant="outline">
                   Criar conta
                 </Button>
               </Link>
@@ -147,9 +149,11 @@ export function CheckoutForm({
           </Card>
         ) : null}
 
-        <Card className="p-6">
-          <h2 className="font-display text-xl font-semibold text-ink">Seus dados</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <Card className="p-7 md:p-8">
+          <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
+            Seus dados
+          </h2>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <Field label="Nome completo" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
             <Field label="E-mail" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
             <Field label="Telefone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
@@ -157,9 +161,11 @@ export function CheckoutForm({
           </div>
         </Card>
 
-        <Card className="p-6">
-          <h2 className="font-display text-xl font-semibold text-ink">Pagamento</h2>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <Card className="p-7 md:p-8">
+          <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
+            Pagamento
+          </h2>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <MethodOption active={method === "PIX"} onClick={() => setMethod("PIX")} icon={QrCode} title="Pix" desc="Aprovação imediata" />
             <MethodOption active={method === "CREDIT_CARD"} onClick={() => setMethod("CREDIT_CARD")} icon={CreditCard} title="Cartão de crédito" desc="Em até 12x" />
           </div>
@@ -167,28 +173,32 @@ export function CheckoutForm({
       </div>
 
       <aside>
-        <Card className="sticky top-24 p-6">
-          <h2 className="font-display text-xl font-semibold text-ink">Resumo</h2>
-          <ul className="mt-4 space-y-3">
+        <Card className="sticky top-24 p-7 shadow-float md:p-8">
+          <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
+            Resumo
+          </h2>
+          <ul className="mt-5 space-y-4">
             {lines.map((line, i) => (
-              <li key={i} className="flex justify-between gap-4 text-sm">
+              <li key={i} className="flex justify-between gap-4 text-[15px]">
                 <span className="text-ink-muted">
                   {line.quantity}× {line.label}
-                  <span className="block text-xs text-ink-subtle">{line.detail}</span>
+                  <span className="mt-0.5 block text-sm text-ink-subtle">{line.detail}</span>
                 </span>
-                <span className="font-medium text-ink">
+                <span className="font-semibold text-ink">
                   {formatMoney(money(line.quantity * line.unitPrice.amount))}
                 </span>
               </li>
             ))}
           </ul>
-          <div className="mt-5 flex items-center justify-between border-t border-surface-border pt-4">
-            <span className="text-sm text-ink-muted">Total</span>
-            <span className="font-display text-2xl font-semibold text-ink">{formatMoney(total)}</span>
+          <div className="mt-6 flex items-center justify-between border-t border-surface-border pt-5">
+            <span className="text-sm font-medium text-ink-muted">Total</span>
+            <span className="font-display text-3xl font-semibold tracking-tight text-ink">
+              {formatMoney(total)}
+            </span>
           </div>
-          {error ? <p className="mt-3 text-xs text-red-600">{error}</p> : null}
+          {error ? <p className="mt-3 text-sm font-medium text-red-600">{error}</p> : null}
           <Button
-            className="mt-5 w-full"
+            className="mt-6 w-full"
             size="lg"
             disabled={!valid || submitting || !user}
             onClick={() => void onSubmit()}
@@ -198,7 +208,7 @@ export function CheckoutForm({
                 <Loader2 className="h-4 w-4 animate-spin" /> Salvando…
               </>
             ) : (
-              "Finalizar compra"
+              "Confirmar pedido"
             )}
           </Button>
         </Card>
@@ -220,12 +230,12 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-ink">{label}</span>
+      <span className="mb-2 block text-sm font-semibold text-ink">{label}</span>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1.5 h-11 w-full rounded-xl border border-surface-border bg-surface px-3.5 text-sm text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20"
+        className="h-12 w-full rounded-xl border border-surface-border bg-surface px-4 text-[15px] text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/15"
       />
     </label>
   );
@@ -249,21 +259,23 @@ function MethodOption({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 rounded-xl border p-4 text-left transition-colors",
-        active ? "border-brand bg-brand/5" : "border-surface-border hover:border-brand",
+        "flex min-h-[4.5rem] items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-150",
+        active
+          ? "border-brand bg-brand/5 shadow-sm"
+          : "border-surface-border hover:border-brand/40",
       )}
     >
       <span
         className={cn(
-          "flex h-10 w-10 items-center justify-center rounded-lg",
+          "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl",
           active ? "bg-brand text-brand-fg" : "bg-surface-subtle text-ink-muted",
         )}
       >
-        <Icon className="h-5 w-5" />
+        <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
       <div>
-        <p className="text-sm font-medium text-ink">{title}</p>
-        <p className="text-xs text-ink-subtle">{desc}</p>
+        <p className="text-[15px] font-semibold text-ink">{title}</p>
+        <p className="mt-0.5 text-sm text-ink-subtle">{desc}</p>
       </div>
     </button>
   );

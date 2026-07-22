@@ -9,6 +9,8 @@ de ingressos)** e **produtos compostos (passaportes)** — em arquitetura
 
 - **Next.js (App Router) + TypeScript strict** — SSR/SEO no storefront e no backoffice.
 - **Tailwind CSS** — design system com theming por tenant via CSS variables.
+  Identidade OneRio: **Noite Fresca / Rota Quente / Luz do Dia**, tipografia
+  **Chillax** (títulos) + **Satoshi** (texto).
 - **Firebase** — Firestore (dados), Auth (papéis) e Storage (bilhetes/CMS).
 - **Zod** — validação na borda (server actions).
 

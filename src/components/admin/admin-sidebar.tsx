@@ -42,8 +42,12 @@ export function AdminSidebar() {
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-brand-fg">
           <Ticket className="h-4 w-4" />
         </span>
-        <span className="font-display text-lg font-semibold text-ink">OneRio</span>
-        <span className="rounded bg-surface-subtle px-1.5 py-0.5 text-[10px] font-medium text-ink-subtle">admin</span>
+        <span className="font-display text-lg font-semibold tracking-tight text-brand">
+          OneRio
+        </span>
+        <span className="rounded bg-surface-subtle px-1.5 py-0.5 text-[10px] font-medium text-ink-subtle">
+          admin
+        </span>
       </Link>
 
       <nav className="mt-8 space-y-1">

@@ -31,8 +31,8 @@ Lista numerada por prioridade sugerida (do bloqueante ao evolutivo).
 14. ~~Editor de calendário: slots, temporadas, blackouts, lead time, validade~~
 15. ~~Editor de conteúdo rico (blocos)~~ — editor de blocos com URL de imagem; upload Storage CMS pendente
 16. ~~Editor de passaporte: composição, obrigatórios/opcionais, preço fechado~~
-17. CRUD de parceiros (integração, comissão, estratégia padrão)
-18. CRUD de sites (domínios, tema, recorte de catálogo, branding)
+17. ~~CRUD de parceiros (integração, comissão, estratégia padrão)~~
+18. ~~CRUD de sites (domínios, tema, recorte de catálogo, branding)~~
 19. Publicação/rascunho/arquivo com preview por site
 20. SEO por página (meta title/description, OG image, sitemap)
 
@@ -95,7 +95,7 @@ Lista numerada por prioridade sugerida (do bloqueante ao evolutivo).
 
 ---
 
-**Sugestão de próximo bloco:** gateway de pagamento (**8–10**), e-mail pós-emissão (**28**), CRUD parceiros/sites (**17–18**), adapter API piloto (**31**).
+**Sugestão de próximo bloco:** gateway de pagamento (**8–10**), e-mail pós-emissão (**28**), adapter API piloto (**31**).
 
 **Ops manuais agora:**
 - Publicar rules: `npm run firebase:rules`

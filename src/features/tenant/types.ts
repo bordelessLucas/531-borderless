@@ -7,7 +7,7 @@ import type { ID, PublishStatus, Timestamps } from "@/features/shared/types";
  * próprio domínio, tema e recorte de catálogo, tudo servido pelo mesmo código.
  */
 export interface SiteTheme {
-  /** Cores em "R G B" (ex.: "17 24 39") para casar com as CSS variables do Tailwind. */
+  /** Cores em "R G B" (ex.: "0 8 95" = Noite Fresca) para CSS variables. */
   brand: string;
   brandFg: string;
   brandMuted: string;

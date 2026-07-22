@@ -2,15 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Minus, Plus } from "lucide-react";
 import type { AvailabilityPolicy, TicketType } from "@/features/attractions/types";
 import {
   listAvailableDays,
   slotsForDate,
 } from "@/features/attractions/availability";
 import { formatMoney, money } from "@/features/shared/types";
+import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { QuantityStepper } from "@/components/ui/quantity-stepper";
 import { cn } from "@/lib/utils";
 
 interface BookingPanelProps {
@@ -19,7 +20,11 @@ interface BookingPanelProps {
   availability: AvailabilityPolicy;
 }
 
-export function BookingPanel({ productSlug, ticketTypes, availability }: BookingPanelProps) {
+export function BookingPanel({
+  productSlug,
+  ticketTypes,
+  availability,
+}: BookingPanelProps) {
   const dates = useMemo(() => listAvailableDays(availability, 14), [availability]);
   const [date, setDate] = useState<string>(
     availability.mode === "OPEN" ? "" : dates[0]?.iso ?? "",
@@ -31,11 +36,8 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
   const [slot, setSlot] = useState<string>(slots[0]?.start ?? "");
   const [qty, setQty] = useState<Record<string, number>>({});
 
-  const setQuantity = (id: string, delta: number, max: number) =>
-    setQty((prev) => {
-      const next = Math.min(Math.max((prev[id] ?? 0) + delta, 0), max);
-      return { ...prev, [id]: next };
-    });
+  const setQuantity = (id: string, next: number, max: number) =>
+    setQty((prev) => ({ ...prev, [id]: Math.min(Math.max(next, 0), max) }));
 
   const total = ticketTypes.reduce(
     (sum, tt) => sum + (qty[tt.id] ?? 0) * tt.price.amount,
@@ -56,16 +58,16 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
   };
 
   return (
-    <Card className="sticky top-24 p-6">
+    <Card className="sticky top-24 p-7 shadow-float md:p-8">
       {availability.mode !== "OPEN" ? (
         <div>
           <p className="text-sm font-semibold text-ink">Escolha a data</p>
           {dates.length === 0 ? (
-            <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3.5 text-sm text-amber-800">
               Nenhuma data disponível no momento (calendário/lead time).
             </p>
           ) : (
-            <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+            <div className="mt-4 flex gap-2.5 overflow-x-auto pb-1">
               {dates.map((d) => (
                 <button
                   key={d.iso}
@@ -76,10 +78,10 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
                     setSlot(nextSlots[0]?.start ?? "");
                   }}
                   className={cn(
-                    "shrink-0 rounded-xl border px-3 py-2 text-center text-xs capitalize transition-colors",
+                    "min-w-[4.5rem] shrink-0 rounded-2xl border px-3.5 py-3 text-center text-sm capitalize transition-all duration-150",
                     date === d.iso
-                      ? "border-brand bg-brand text-brand-fg"
-                      : "border-surface-border text-ink-muted hover:border-brand",
+                      ? "border-brand bg-brand text-brand-fg shadow-sm"
+                      : "border-surface-border text-ink-muted hover:border-brand/40 hover:text-ink",
                   )}
                 >
                   {d.label}
@@ -89,25 +91,25 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
           )}
         </div>
       ) : (
-        <p className="rounded-xl bg-surface-subtle px-4 py-3 text-sm text-ink-muted">
+        <p className="rounded-2xl bg-surface-subtle px-4 py-3.5 text-sm leading-relaxed text-ink-muted">
           Voucher com data livre — válido por {availability.validityDays ?? 90} dias.
         </p>
       )}
 
       {availability.mode === "SCHEDULED" && slots.length > 0 ? (
-        <div className="mt-5">
+        <div className="mt-6">
           <p className="text-sm font-semibold text-ink">Horário</p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2.5">
             {slots.map((s) => (
               <button
                 key={s.start}
                 type="button"
                 onClick={() => setSlot(s.start)}
                 className={cn(
-                  "rounded-lg border px-3 py-1.5 text-sm transition-colors",
+                  "min-h-11 rounded-xl border px-4 text-[15px] font-medium transition-all duration-150",
                   slot === s.start
-                    ? "border-brand bg-brand text-brand-fg"
-                    : "border-surface-border text-ink-muted hover:border-brand",
+                    ? "border-brand bg-brand text-brand-fg shadow-sm"
+                    : "border-surface-border text-ink-muted hover:border-brand/40 hover:text-ink",
                 )}
               >
                 {s.start}
@@ -117,47 +119,43 @@ export function BookingPanel({ productSlug, ticketTypes, availability }: Booking
         </div>
       ) : null}
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-7 space-y-5">
         <p className="text-sm font-semibold text-ink">Ingressos</p>
         {ticketTypes.map((tt) => (
-          <div key={tt.id} className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-ink">{tt.name}</p>
-              <p className="text-sm text-ink-muted">{formatMoney(tt.price)}</p>
+          <div
+            key={tt.id}
+            className="flex items-center justify-between gap-4 rounded-2xl border border-surface-border/70 bg-surface-subtle/50 px-4 py-3.5"
+          >
+            <div className="min-w-0">
+              <p className="text-[15px] font-semibold text-ink">{tt.name}</p>
+              <p className="mt-0.5 text-sm text-ink-muted">{formatMoney(tt.price)}</p>
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setQuantity(tt.id, -1, tt.maxPerOrder)}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-surface-border text-ink-muted transition-colors hover:border-brand disabled:opacity-40"
-                disabled={(qty[tt.id] ?? 0) === 0}
-                aria-label={`Remover ${tt.name}`}
-              >
-                <Minus className="h-4 w-4" />
-              </button>
-              <span className="w-5 text-center text-sm font-medium">{qty[tt.id] ?? 0}</span>
-              <button
-                type="button"
-                onClick={() => setQuantity(tt.id, 1, tt.maxPerOrder)}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-surface-border text-ink-muted transition-colors hover:border-brand"
-                aria-label={`Adicionar ${tt.name}`}
-              >
-                <Plus className="h-4 w-4" />
-              </button>
-            </div>
+            <QuantityStepper
+              value={qty[tt.id] ?? 0}
+              min={0}
+              max={tt.maxPerOrder}
+              onChange={(next) => setQuantity(tt.id, next, tt.maxPerOrder)}
+              labelDecrease={`Remover ${tt.name}`}
+              labelIncrease={`Adicionar ${tt.name}`}
+            />
           </div>
         ))}
       </div>
 
-      <div className="mt-6 border-t border-surface-border pt-5">
+      <div className="mt-7 border-t border-surface-border pt-6">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-ink-muted">Total</span>
-          <span className="font-display text-2xl font-semibold text-ink">
+          <span className="text-sm font-medium text-ink-muted">Total</span>
+          <span className="font-display text-3xl font-semibold tracking-tight text-ink">
             {formatMoney(money(total))}
           </span>
         </div>
-        <Button className="mt-4 w-full" size="lg" disabled={!canCheckout} onClick={goToCheckout}>
-          Continuar para o pagamento
+        <Button
+          className="mt-5 w-full"
+          size="lg"
+          disabled={!canCheckout}
+          onClick={goToCheckout}
+        >
+          {ONERIO_VOICE.cta.goToCheckout}
         </Button>
       </div>
     </Card>

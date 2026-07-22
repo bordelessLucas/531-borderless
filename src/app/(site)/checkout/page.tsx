@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getCurrentSite } from "@/features/tenant/server";
+import { ONERIO_VOICE } from "@/features/tenant/voice";
 import {
   getProductBySlug,
   getTicketTypeById,
@@ -8,7 +9,10 @@ import {
 import { money } from "@/features/shared/types";
 import { CheckoutForm, type CheckoutLine } from "@/components/checkout/checkout-form";
 
-export const metadata: Metadata = { title: "Checkout" };
+export const metadata: Metadata = {
+  title: ONERIO_VOICE.checkout.title,
+  description: ONERIO_VOICE.promise,
+};
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -34,7 +38,7 @@ export default async function CheckoutPage({ searchParams }: PageProps) {
     const qty = Number(sp.passport ?? 1) || 1;
     lines.push({
       label: product.name,
-      detail: "Passaporte — agendamento após a compra",
+      detail: "Passaporte — datas das atrações após a confirmação",
       quantity: qty,
       unitPrice: product.passportPrice ?? product.fromPrice,
     });
@@ -61,16 +65,22 @@ export default async function CheckoutPage({ searchParams }: PageProps) {
   if (!product || lines.length === 0) {
     return (
       <div className="container py-20 text-center">
-        <h1 className="font-display text-2xl font-semibold text-ink">Seu carrinho está vazio</h1>
-        <p className="mt-2 text-ink-muted">Escolha uma atração ou passaporte para continuar.</p>
-        <Link href="/" className="mt-6 inline-block text-brand hover:underline">Voltar à página inicial</Link>
+        <h1 className="font-display text-2xl font-semibold text-ink">
+          {ONERIO_VOICE.checkout.emptyTitle}
+        </h1>
+        <p className="mt-2 text-ink-muted">{ONERIO_VOICE.checkout.emptySupport}</p>
+        <Link href="/atracoes" className="mt-6 inline-block text-brand hover:underline">
+          {ONERIO_VOICE.cta.exploreAttractions}
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="container py-12">
-      <h1 className="mb-8 font-display text-3xl font-semibold text-ink">Finalizar compra</h1>
+      <h1 className="mb-8 font-display text-3xl font-semibold text-ink">
+        {ONERIO_VOICE.checkout.title}
+      </h1>
       <CheckoutForm
         lines={lines}
         total={total}

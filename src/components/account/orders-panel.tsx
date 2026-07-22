@@ -13,6 +13,7 @@ import { Download, Ticket } from "lucide-react";
 import { getDb } from "@/lib/firebase/client";
 import { COLLECTIONS } from "@/lib/firebase/collections";
 import { useAuth } from "@/features/auth/auth-provider";
+import { ONERIO_VOICE } from "@/features/tenant/voice";
 import type { Order } from "@/features/orders/types";
 import type { Fulfillment } from "@/features/fulfillment/types";
 import { formatMoney } from "@/features/shared/types";
@@ -108,10 +109,10 @@ export function OrdersList() {
         <Ticket className="mx-auto h-10 w-10 text-ink-subtle" />
         <h2 className="mt-3 font-display text-xl font-semibold text-ink">Nenhum pedido ainda</h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Quando você comprar um ingresso ou passaporte, ele aparece aqui.
+          {ONERIO_VOICE.account.ordersEmpty}
         </p>
         <Link href="/atracoes" className="mt-5 inline-block">
-          <Button>Explorar atrações</Button>
+          <Button>{ONERIO_VOICE.cta.exploreAttractions}</Button>
         </Link>
       </Card>
     );

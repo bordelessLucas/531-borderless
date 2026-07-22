@@ -2,19 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
+/* OneRio — Chillax (títulos) + Satoshi (texto). Fonte: Fontshare / livro da marca. */
+@font-face {
+  font-family: "Chillax";
+  src: url("/fonts/chillax-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Chillax";
+  src: url("/fonts/chillax-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Chillax";
+  src: url("/fonts/chillax-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  /* Defaults do site principal (OneRio). Cada tenant sobrescreve via inline style. */
-  --brand: 13 26 38;
-  --brand-fg: 255 255 255;
-  --brand-muted: 233 122 60;
+  /*
+   * Paleta OneRio (livro da marca):
+   * Noite Fresca #00085F | Rota Quente #FF5D06 | Luz do Dia #FBFFE1
+   * Solo Nativo #2B0F0D | Rosa de Rua #F51C52 | Trilha Aberta #2BEB04
+   * Cada tenant sobrescreve --brand* via inline style.
+   */
+  --brand: 0 8 95;
+  --brand-fg: 251 255 225;
+  --brand-muted: 255 93 6;
 
-  --surface: 255 255 255;
-  --surface-subtle: 248 249 250;
-  --surface-border: 226 229 233;
+  --surface: 251 255 225;
+  --surface-subtle: 244 248 214;
+  --surface-border: 220 226 180;
 
-  --ink: 17 24 32;
-  --ink-muted: 82 92 104;
-  --ink-subtle: 138 148 160;
+  --ink: 43 15 13;
+  --ink-muted: 90 55 50;
+  --ink-subtle: 140 110 105;
+
+  --accent-pink: 245 28 82;
+  --accent-green: 43 235 4;
+  --accent-earth: 43 15 13;
+
+  --font-sans: "Satoshi", system-ui, sans-serif;
+  --font-display: "Chillax", system-ui, sans-serif;
 }
 
 @layer base {
@@ -23,15 +79,27 @@
   }
   body {
     @apply bg-surface text-ink antialiased;
-    font-feature-settings: "ss01", "cv01";
+    font-family: var(--font-sans);
   }
   ::selection {
-    @apply bg-brand-muted/25;
+    @apply bg-brand-muted/30 text-ink;
   }
 }
 
 @layer components {
   .container-page {
     @apply container mx-auto;
+  }
+
+  /** Títulos de impacto (livro: Chillax Bold, preferência caixa alta). */
+  .heading-display {
+    @apply font-display font-bold uppercase tracking-tight;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .heading-section {
+    @apply font-display font-semibold tracking-tight text-ink;
+    line-height: 1.15;
   }
 }

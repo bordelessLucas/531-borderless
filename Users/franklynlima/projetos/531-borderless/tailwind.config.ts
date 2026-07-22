@@ -45,19 +45,8 @@ const config: Config = {
         "3xl": "1.75rem",
       },
       boxShadow: {
-        card: "0 1px 2px rgb(0 8 95 / 0.04), 0 16px 40px -16px rgb(0 8 95 / 0.12)",
-        float: "0 12px 48px -16px rgb(0 8 95 / 0.22)",
-      },
-      spacing: {
-        13: "3.25rem",
-        15: "3.75rem",
-        18: "4.5rem",
-      },
-      minHeight: {
-        10: "2.5rem",
-        11: "2.75rem",
-        12: "3rem",
-        14: "3.5rem",
+        card: "0 1px 2px rgb(0 8 95 / 0.04), 0 12px 32px -12px rgb(0 8 95 / 0.14)",
+        float: "0 8px 40px -12px rgb(0 8 95 / 0.28)",
       },
       keyframes: {
         "fade-up": {

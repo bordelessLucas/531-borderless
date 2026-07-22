@@ -1,35 +1,52 @@
 import Link from "next/link";
 import type { Site } from "@/features/tenant/types";
+import { ONERIO_VOICE } from "@/features/tenant/voice";
+import { BrandMark } from "@/components/layout/brand-mark";
 
 export function SiteFooter({ site }: { site: Site }) {
   return (
-    <footer className="border-t border-surface-border bg-surface-subtle">
+    <footer className="border-t border-surface-border bg-brand text-brand-fg">
       <div className="container grid gap-8 py-12 md:grid-cols-4">
         <div className="md:col-span-2">
-          <p className="font-display text-lg font-semibold text-ink">{site.name}</p>
-          <p className="mt-2 max-w-sm text-sm text-ink-muted">
-            Ingressos, experiências e passaportes turísticos com curadoria e uma
-            experiência de compra impecável.
+          <BrandMark
+            name={site.name}
+            logoUrl={site.theme.logoUrl || undefined}
+            inverted
+          />
+          <p className="mt-3 max-w-sm text-sm text-brand-fg/75">
+            {ONERIO_VOICE.footer.blurb}
           </p>
         </div>
         <div>
-          <p className="text-sm font-semibold text-ink">Explorar</p>
-          <ul className="mt-3 space-y-2 text-sm text-ink-muted">
-            <li><Link href="/atracoes" className="hover:text-ink">Atrações</Link></li>
-            <li><Link href="/passaportes" className="hover:text-ink">Passaportes</Link></li>
+          <p className="font-display text-sm font-semibold uppercase tracking-wide text-brand-fg">
+            Explorar
+          </p>
+          <ul className="mt-3 space-y-2 text-sm text-brand-fg/75">
+            <li>
+              <Link href="/atracoes" className="hover:text-brand-fg">
+                Atrações
+              </Link>
+            </li>
+            <li>
+              <Link href="/passaportes" className="hover:text-brand-fg">
+                Passaportes
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
-          <p className="text-sm font-semibold text-ink">Contato</p>
-          <ul className="mt-3 space-y-2 text-sm text-ink-muted">
+          <p className="font-display text-sm font-semibold uppercase tracking-wide text-brand-fg">
+            Contato
+          </p>
+          <ul className="mt-3 space-y-2 text-sm text-brand-fg/75">
             <li>{site.contactEmail}</li>
             {site.supportPhone ? <li>{site.supportPhone}</li> : null}
           </ul>
         </div>
       </div>
-      <div className="border-t border-surface-border py-4">
-        <p className="container text-xs text-ink-subtle">
-          © {new Date().getFullYear()} {site.name}. Todos os direitos reservados.
+      <div className="border-t border-brand-fg/15 py-4">
+        <p className="container text-xs text-brand-fg/55">
+          © {new Date().getFullYear()} {site.name}. {ONERIO_VOICE.tagline}
         </p>
       </div>
     </footer>

@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { registerWithEmail, signInWithEmail, signInWithGoogle } from "@/features/auth/client";
+import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field } from "@/components/ui/input";
@@ -68,10 +69,10 @@ export function LoginForm() {
 
   return (
     <Card className="mx-auto w-full max-w-md p-8">
-      <h1 className="font-display text-2xl font-semibold text-ink">Entrar</h1>
-      <p className="mt-1 text-sm text-ink-muted">
-        Acesse pedidos, bilhetes e o backoffice (staff).
-      </p>
+      <h1 className="font-display text-2xl font-semibold text-ink">
+        {ONERIO_VOICE.auth.loginTitle}
+      </h1>
+      <p className="mt-1 text-sm text-ink-muted">{ONERIO_VOICE.auth.loginSupport}</p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <Field
@@ -157,10 +158,10 @@ export function RegisterForm() {
 
   return (
     <Card className="mx-auto w-full max-w-md p-8">
-      <h1 className="font-display text-2xl font-semibold text-ink">Criar conta</h1>
-      <p className="mt-1 text-sm text-ink-muted">
-        Guarde seus pedidos e baixe bilhetes quando estiverem prontos.
-      </p>
+      <h1 className="font-display text-2xl font-semibold text-ink">
+        {ONERIO_VOICE.auth.registerTitle}
+      </h1>
+      <p className="mt-1 text-sm text-ink-muted">{ONERIO_VOICE.auth.registerSupport}</p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <Field

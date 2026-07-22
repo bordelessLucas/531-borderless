@@ -11,18 +11,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-brand text-brand-fg hover:bg-brand/90 shadow-sm focus-visible:ring-brand",
+    "bg-brand text-brand-fg shadow-sm hover:bg-brand/90 hover:shadow-md active:scale-[0.98] focus-visible:ring-brand",
   secondary:
-    "bg-brand-muted text-white hover:bg-brand-muted/90 focus-visible:ring-brand-muted",
+    "bg-brand-muted text-white shadow-sm hover:bg-brand-muted/90 hover:shadow-md active:scale-[0.98] focus-visible:ring-brand-muted",
   outline:
-    "border border-surface-border bg-surface text-ink hover:bg-surface-subtle focus-visible:ring-brand",
-  ghost: "text-ink hover:bg-surface-subtle focus-visible:ring-brand",
+    "border border-surface-border bg-surface text-ink shadow-sm hover:border-brand/30 hover:bg-surface-subtle active:scale-[0.98] focus-visible:ring-brand",
+  ghost:
+    "text-ink-muted hover:bg-surface-subtle hover:text-ink focus-visible:ring-brand",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-4 text-sm",
-  md: "h-11 px-5 text-sm",
-  lg: "h-13 px-7 text-base",
+  sm: "h-10 min-h-10 px-4 text-sm",
+  md: "h-12 min-h-12 px-6 text-[15px]",
+  lg: "h-14 min-h-14 px-8 text-base",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -30,9 +31,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-        "disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2.5 rounded-full font-semibold tracking-tight",
+        "transition-all duration-200 ease-out",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
+        "disabled:pointer-events-none disabled:opacity-45",
         variants[variant],
         sizes[size],
         className,
