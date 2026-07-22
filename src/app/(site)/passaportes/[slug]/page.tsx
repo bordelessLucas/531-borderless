@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { CalendarClock, CalendarDays, Cpu, Ticket, UserCog } from "lucide-react";
+import { CalendarClock, CalendarDays, Cpu, UserCog } from "lucide-react";
 import { getCurrentSite } from "@/features/tenant/server";
 import {
   getAttractionById,
@@ -13,15 +13,19 @@ import type { AvailabilityMode } from "@/features/attractions/types";
 import type { FulfillmentStrategy } from "@/features/partners/types";
 import { ContentBlocks } from "@/components/catalog/content-blocks";
 import { PassportBookingPanel } from "@/components/booking/passport-booking-panel";
+import { BrandIcon, IconTicket } from "@/components/brand/icons";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-const modeLabel: Record<AvailabilityMode, { icon: typeof CalendarDays; label: string }> = {
+const modeLabel: Record<
+  AvailabilityMode,
+  { icon: typeof CalendarDays | typeof IconTicket; label: string }
+> = {
   SCHEDULED: { icon: CalendarClock, label: "Data e horário marcados" },
   DATED: { icon: CalendarDays, label: "Data livre" },
-  OPEN: { icon: Ticket, label: "Sem data (voucher)" },
+  OPEN: { icon: IconTicket, label: "Sem data (voucher)" },
 };
 
 const strategyLabel: Record<FulfillmentStrategy, { icon: typeof Cpu; label: string }> = {
@@ -64,7 +68,12 @@ export default async function PassaportePage({ params }: PageProps) {
         <Image src={product.heroImage.url} alt={product.heroImage.alt} fill priority className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
         <div className="container relative flex h-full flex-col justify-end pb-8 text-white">
-          <span className="w-fit rounded-full bg-brand-muted px-3 py-1 text-xs font-semibold">Passaporte</span>
+          <div className="flex items-center gap-3">
+            <BrandIcon id="ticket" size="md" tone="soft" className="bg-white/15 text-white" />
+            <span className="w-fit rounded-full bg-brand-muted px-3 py-1 text-xs font-semibold text-white">
+              Passaporte
+            </span>
+          </div>
           <h1 className="mt-3 font-display text-4xl font-semibold md:text-5xl">{product.name}</h1>
           <p className="mt-1 text-white/80">{product.tagline}</p>
         </div>

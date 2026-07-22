@@ -1,19 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarCheck, LayoutGrid, ShieldCheck } from "lucide-react";
 import { getCurrentSite } from "@/features/tenant/server";
 import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { listProductsForSite } from "@/lib/repository";
 import { ProductCard } from "@/components/catalog/product-card";
 import { Button } from "@/components/ui/button";
+import { BrandIcon, type BrandIconId } from "@/components/brand/icons";
 
-const perkIcons = [CalendarCheck, LayoutGrid, ShieldCheck] as const;
+/** Perks da home → ícones oficiais do brand book (contexto de visita). */
+const perkIcons: BrandIconId[] = ["aviao", "ticket", "camera"];
 
 export default async function HomePage() {
   const site = await getCurrentSite();
   const products = await listProductsForSite(site);
-  const passport = products.find((p) => p.type === "PASSPORT");
-  const attractions = products.filter((p) => p.type === "SIMPLE");
+  const passport = products.find((p) => p.type === "PASSPORT" && p.featured);
+  const attractions = products
+    .filter((p) => p.type === "SIMPLE" && p.featured)
+    .slice(0, 6);
   const copy = ONERIO_VOICE;
 
   return (
@@ -27,7 +30,7 @@ export default async function HomePage() {
             priority
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[rgb(0_8_95)]/95 via-[rgb(0_8_95)]/55 to-black/25" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand/95 via-brand/55 to-black/25" />
         </div>
         <div className="container relative flex min-h-[560px] flex-col justify-end py-16 text-brand-fg">
           <span className="inline-flex w-fit items-center gap-2 rounded-full bg-brand-muted px-4 py-1.5 text-sm font-medium text-white">
@@ -36,7 +39,9 @@ export default async function HomePage() {
           <h1 className="heading-display mt-5 max-w-2xl text-4xl text-brand-fg md:text-6xl">
             {copy.home.headline}
           </h1>
-          <p className="mt-4 max-w-xl text-lg text-brand-fg/80">{copy.home.support}</p>
+          <p className="mt-4 max-w-xl text-lg font-light text-brand-fg/80">
+            {copy.home.support}
+          </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/passaportes">
               <Button size="lg" variant="secondary">
@@ -56,22 +61,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-surface-border bg-surface-subtle">
-        <div className="container grid gap-6 py-10 md:grid-cols-3">
-          {copy.home.perks.map((perk, index) => {
-            const Icon = perkIcons[index] ?? ShieldCheck;
-            return (
-              <div key={perk.title} className="flex gap-4">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand text-brand-fg shadow-sm">
-                  <Icon className="h-5 w-5" strokeWidth={2.25} />
-                </span>
-                <div>
-                  <p className="text-[15px] font-semibold text-ink">{perk.title}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-ink-muted">{perk.desc}</p>
-                </div>
+      <section className="border-b border-surface-border bg-surface">
+        <div className="container grid gap-8 py-12 md:grid-cols-3 md:gap-10">
+          {copy.home.perks.map((perk, index) => (
+            <div key={perk.title} className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <BrandIcon id={perkIcons[index] ?? "ticket"} size="lg" tone="ui" />
+              <div className="min-w-0">
+                <p className="font-display text-base font-semibold tracking-tight text-ink">
+                  {perk.title}
+                </p>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{perk.desc}</p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -88,9 +90,12 @@ export default async function HomePage() {
                 />
               </div>
               <div className="flex flex-col justify-center gap-4 bg-brand p-10 text-brand-fg">
-                <span className="w-fit rounded-full bg-brand-muted px-3 py-1 text-xs font-medium text-white">
-                  {copy.home.featuredPassportLabel}
-                </span>
+                <div className="flex items-center gap-3">
+                  <BrandIcon id="ticket" size="md" tone="soft" className="bg-brand-fg/15 text-brand-fg" />
+                  <span className="w-fit rounded-full bg-brand-muted px-3 py-1 text-xs font-medium text-white">
+                    {copy.home.featuredPassportLabel}
+                  </span>
+                </div>
                 <h2 className="heading-display text-3xl text-brand-fg">{passport.name}</h2>
                 <p className="text-brand-fg/80">{passport.tagline}</p>
                 <Link href={`/passaportes/${passport.slug}`} className="mt-2">

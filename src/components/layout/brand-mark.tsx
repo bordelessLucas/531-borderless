@@ -1,5 +1,9 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import {
+  ONERIO_LOGO_LIGHT_URL,
+  ONERIO_LOGO_URL,
+} from "@/features/tenant/brand";
 
 interface BrandMarkProps {
   name: string;
@@ -11,8 +15,7 @@ interface BrandMarkProps {
 }
 
 /**
- * Marca OneRio: usa logoUrl do site quando houver; senão wordmark em Chillax
- * (até os arquivos oficiais do livro da marca serem anexados).
+ * Marca OneRio: usa logoUrl do site quando houver; senão wordmark em Chillax.
  */
 export function BrandMark({
   name,
@@ -22,15 +25,21 @@ export function BrandMark({
   size = "md",
 }: BrandMarkProps) {
   if (logoUrl) {
+    const src =
+      inverted && (logoUrl === ONERIO_LOGO_URL || logoUrl.endsWith("/onerio-logo.png"))
+        ? ONERIO_LOGO_LIGHT_URL
+        : logoUrl;
+
     return (
       <span className={cn("relative inline-flex items-center", className)}>
         <Image
-          src={logoUrl}
+          src={src}
           alt={name}
-          width={size === "sm" ? 120 : 148}
-          height={size === "sm" ? 28 : 36}
+          width={size === "sm" ? 140 : 168}
+          height={size === "sm" ? 45 : 54}
           className="h-7 w-auto object-contain md:h-8"
           unoptimized
+          priority
         />
       </span>
     );

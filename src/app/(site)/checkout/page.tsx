@@ -8,6 +8,8 @@ import {
 } from "@/lib/repository";
 import { money } from "@/features/shared/types";
 import { CheckoutForm, type CheckoutLine } from "@/components/checkout/checkout-form";
+import { BrandIcon } from "@/components/brand/icons";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: ONERIO_VOICE.checkout.title,
@@ -65,12 +67,13 @@ export default async function CheckoutPage({ searchParams }: PageProps) {
   if (!product || lines.length === 0) {
     return (
       <div className="container py-20 text-center">
-        <h1 className="font-display text-2xl font-semibold text-ink">
+        <BrandIcon id="ticket" size="xl" tone="soft" className="mx-auto" />
+        <h1 className="mt-4 font-display text-2xl font-semibold text-ink">
           {ONERIO_VOICE.checkout.emptyTitle}
         </h1>
         <p className="mt-2 text-ink-muted">{ONERIO_VOICE.checkout.emptySupport}</p>
-        <Link href="/atracoes" className="mt-6 inline-block text-brand hover:underline">
-          {ONERIO_VOICE.cta.exploreAttractions}
+        <Link href="/atracoes" className="mt-6 inline-block">
+          <Button variant="secondary">{ONERIO_VOICE.cta.exploreAttractions}</Button>
         </Link>
       </div>
     );

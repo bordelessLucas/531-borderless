@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { Product } from "@/features/catalog/types";
 import { formatMoney } from "@/features/shared/types";
 import { Badge } from "@/components/ui/card";
+import { IconTicket } from "@/components/brand/icons";
 
 export function ProductCard({ product }: { product: Product }) {
   const href =
@@ -25,10 +26,15 @@ export function ProductCard({ product }: { product: Product }) {
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
         {product.type === "PASSPORT" ? (
-          <Badge className="absolute left-4 top-4 bg-brand text-brand-fg shadow-sm">
+          <Badge className="absolute left-4 top-4 gap-1.5 bg-brand text-brand-fg shadow-sm">
+            <IconTicket className="h-3.5 w-3.5" />
             Passaporte
           </Badge>
-        ) : null}
+        ) : (
+          <Badge className="absolute left-4 top-4 bg-brand-muted text-white shadow-sm">
+            Atração
+          </Badge>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.08em] text-brand-muted">

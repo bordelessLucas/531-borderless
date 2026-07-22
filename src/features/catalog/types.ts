@@ -46,6 +46,14 @@ export interface Product extends Timestamps {
   slug: string;
   name: string;
   tagline: string;
+  /** Categoria curatorial para organização da vitrine. */
+  category?:
+    | "icone"
+    | "museu"
+    | "familia"
+    | "esporte"
+    | "cinema"
+    | "passaporte";
   heroImage: LocalizedImage;
   content: ContentBlock[];
   status: PublishStatus;

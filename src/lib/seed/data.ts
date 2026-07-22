@@ -1,263 +1,21 @@
 import type { Site } from "@/features/tenant/types";
-import type { Partner } from "@/features/partners/types";
-import type { Attraction, TicketType } from "@/features/attractions/types";
-import type { Product } from "@/features/catalog/types";
 import type { Fulfillment } from "@/features/fulfillment/types";
 import type { Order } from "@/features/orders/types";
 import { money } from "@/features/shared/types";
+import {
+  catalogPartners,
+  catalogAttractions,
+  catalogTicketTypes,
+  catalogProducts,
+  catalogTs,
+} from "@/lib/seed/catalog-rio";
 
-const NOW = "2026-01-01T00:00:00.000Z";
-const ts = { createdAt: NOW, updatedAt: NOW };
+const ts = catalogTs;
 
-const img = (url: string, alt: string) => ({ url, alt });
-
-export const seedPartners: Partner[] = [
-  {
-    id: "partner-corcovado",
-    name: "Trem do Corcovado",
-    slug: "trem-do-corcovado",
-    defaultStrategy: "API",
-    integration: { adapterKey: "generic-rest", config: { baseUrl: "https://api.parceiro.example" } },
-    commissionBps: 1200,
-    contactEmail: "operacao@corcovado.example",
-    isActive: true,
-    ...ts,
-  },
-  {
-    id: "partner-aquario",
-    name: "AquaRio",
-    slug: "aquario",
-    defaultStrategy: "MANUAL",
-    integration: { adapterKey: "manual", config: {} },
-    commissionBps: 1500,
-    contactEmail: "agentes@aquario.example",
-    isActive: true,
-    ...ts,
-  },
-  {
-    id: "partner-pao",
-    name: "Bondinho Pão de Açúcar",
-    slug: "pao-de-acucar",
-    defaultStrategy: "API",
-    integration: { adapterKey: "generic-rest", config: { baseUrl: "https://api.bondinho.example" } },
-    commissionBps: 1000,
-    contactEmail: "parceiros@bondinho.example",
-    isActive: true,
-    ...ts,
-  },
-  {
-    id: "partner-amanha",
-    name: "Museu do Amanhã",
-    slug: "museu-do-amanha",
-    defaultStrategy: "MANUAL",
-    integration: { adapterKey: "manual", config: {} },
-    commissionBps: 1800,
-    contactEmail: "bilheteria@amanha.example",
-    isActive: true,
-    ...ts,
-  },
-];
-
-export const seedAttractions: Attraction[] = [
-  {
-    id: "attr-corcovado",
-    partnerId: "partner-corcovado",
-    slug: "trem-do-corcovado-cristo-redentor",
-    name: "Trem do Corcovado + Cristo Redentor",
-    shortDescription:
-      "Suba pela Floresta da Tijuca de trem até o Cristo Redentor, com horário marcado.",
-    content: [
-      { type: "paragraph", text: "A forma mais icônica de chegar ao Cristo Redentor: um passeio de trem pela mata atlântica com vistas deslumbrantes." },
-      { type: "heading", text: "O que esperar" },
-      { type: "bullets", items: ["Trajeto panorâmico de ~20 minutos", "Acesso ao mirante do Cristo Redentor", "Embarque com horário marcado"] },
-    ],
-    city: "Rio de Janeiro",
-    heroImage: img("https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1600", "Cristo Redentor"),
-    gallery: [
-      img("https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?w=1200", "Vista do Rio"),
-      img("https://images.unsplash.com/photo-1544989164-31dc3c645987?w=1200", "Floresta da Tijuca"),
-    ],
-    highlights: ["Horário marcado", "Emissão automática", "Guia opcional"],
-    usageRules: ["Chegar 30 min antes do embarque", "Bilhete pessoal e intransferível", "Sujeito às condições climáticas"],
-    availability: {
-      mode: "SCHEDULED",
-      weekdays: [],
-      defaultSlots: [
-        { start: "08:00", capacity: 40 },
-        { start: "10:00", capacity: 40 },
-        { start: "13:00", capacity: 40 },
-        { start: "15:00", capacity: 40 },
-      ],
-      blackoutDates: [],
-      seasons: [],
-      leadTimeHours: 3,
-    },
-    status: "PUBLISHED",
-    ...ts,
-  },
-  {
-    id: "attr-aquario",
-    partnerId: "partner-aquario",
-    slug: "aquario-rio",
-    name: "AquaRio — Aquário Marinho",
-    shortDescription: "O maior aquário marinho da América do Sul, com data livre para visita.",
-    content: [
-      { type: "paragraph", text: "Mais de 8 mil animais de 350 espécies em um dos maiores aquários da América Latina." },
-      { type: "bullets", items: ["Túnel submarino de 28 metros", "Data livre — visite quando quiser dentro da validade", "Ideal para famílias"] },
-    ],
-    city: "Rio de Janeiro",
-    heroImage: img("https://images.unsplash.com/photo-1544552866-d3ed42536cfd?w=1600", "Aquário"),
-    gallery: [img("https://images.unsplash.com/photo-1560275619-4662e36fa65c?w=1200", "Peixes")],
-    highlights: ["Data livre", "Emissão manual", "Voucher válido por 90 dias"],
-    usageRules: ["Voucher válido por 90 dias", "Entrada sujeita à capacidade do dia", "Apresentar documento com foto"],
-    availability: {
-      mode: "DATED",
-      weekdays: [2, 3, 4, 5, 6, 0],
-      defaultSlots: [],
-      blackoutDates: ["2026-12-25"],
-      seasons: [
-        { id: "season-verao", label: "Alta temporada (verão)", from: "2026-12-15", to: "2027-02-28", priceAdjustmentBps: 1500 },
-      ],
-      leadTimeHours: 24,
-      validityDays: 90,
-    },
-    status: "PUBLISHED",
-    ...ts,
-  },
-  {
-    id: "attr-pao",
-    partnerId: "partner-pao",
-    slug: "bondinho-pao-de-acucar",
-    name: "Bondinho Pão de Açúcar",
-    shortDescription: "Duas viagens de bondinho até o topo do Pão de Açúcar com vista de 360°.",
-    content: [{ type: "paragraph", text: "Um dos cartões-postais mais famosos do mundo, com vista panorâmica da Baía de Guanabara." }],
-    city: "Rio de Janeiro",
-    heroImage: img("https://images.unsplash.com/photo-1518639192441-8fce0a366e2e?w=1600", "Pão de Açúcar"),
-    gallery: [],
-    highlights: ["Data livre", "Emissão automática", "Acesso aos dois morros"],
-    usageRules: ["Válido para o dia escolhido", "Bilhete pessoal"],
-    availability: {
-      mode: "DATED",
-      weekdays: [],
-      defaultSlots: [],
-      blackoutDates: [],
-      seasons: [],
-      leadTimeHours: 2,
-    },
-    status: "PUBLISHED",
-    ...ts,
-  },
-  {
-    id: "attr-amanha",
-    partnerId: "partner-amanha",
-    slug: "museu-do-amanha",
-    name: "Museu do Amanhã",
-    shortDescription: "Museu de ciências aplicadas no coração do Porto Maravilha.",
-    content: [{ type: "paragraph", text: "Uma experiência imersiva sobre as possibilidades de futuro para o planeta e a sociedade." }],
-    city: "Rio de Janeiro",
-    heroImage: img("https://images.unsplash.com/photo-1580537659466-0a9bfa916a54?w=1600", "Museu do Amanhã"),
-    gallery: [],
-    highlights: ["Data marcada", "Emissão manual", "Exposições interativas"],
-    usageRules: ["Entrada no horário agendado", "Meia-entrada mediante comprovação"],
-    availability: {
-      mode: "SCHEDULED",
-      weekdays: [2, 3, 4, 5, 6, 0],
-      defaultSlots: [
-        { start: "10:00", capacity: 60 },
-        { start: "14:00", capacity: 60 },
-      ],
-      blackoutDates: [],
-      seasons: [],
-      leadTimeHours: 12,
-    },
-    status: "PUBLISHED",
-    ...ts,
-  },
-];
-
-export const seedTicketTypes: TicketType[] = [
-  { id: "tt-corcovado-inteira", attractionId: "attr-corcovado", name: "Inteira", price: money(11500), strategy: "API", partnerSkuCode: "CORC-FULL", maxPerOrder: 10, isActive: true, ...ts },
-  { id: "tt-corcovado-meia", attractionId: "attr-corcovado", name: "Meia-entrada", description: "Estudantes, idosos e crianças (mediante comprovação).", price: money(5750), strategy: "API", partnerSkuCode: "CORC-HALF", maxPerOrder: 10, isActive: true, ...ts },
-  { id: "tt-aquario-inteira", attractionId: "attr-aquario", name: "Inteira", price: money(13000), strategy: "MANUAL", maxPerOrder: 8, isActive: true, ...ts },
-  { id: "tt-aquario-meia", attractionId: "attr-aquario", name: "Meia-entrada", price: money(6500), strategy: "MANUAL", maxPerOrder: 8, isActive: true, ...ts },
-  { id: "tt-pao-inteira", attractionId: "attr-pao", name: "Inteira", price: money(16000), strategy: "API", partnerSkuCode: "PAO-FULL", maxPerOrder: 10, isActive: true, ...ts },
-  { id: "tt-amanha-inteira", attractionId: "attr-amanha", name: "Inteira", price: money(3000), strategy: "MANUAL", maxPerOrder: 10, isActive: true, ...ts },
-];
-
-export const seedProducts: Product[] = [
-  {
-    id: "prod-corcovado",
-    type: "SIMPLE",
-    slug: "trem-do-corcovado-cristo-redentor",
-    name: "Trem do Corcovado + Cristo Redentor",
-    tagline: "Horário marcado • Emissão imediata",
-    heroImage: img("https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1600", "Cristo Redentor"),
-    content: [],
-    status: "PUBLISHED",
-    attractionId: "attr-corcovado",
-    composition: null,
-    fromPrice: money(5750),
-    passportPrice: null,
-    featured: true,
-    ...ts,
-  },
-  {
-    id: "prod-aquario",
-    type: "SIMPLE",
-    slug: "aquario-rio",
-    name: "AquaRio — Aquário Marinho",
-    tagline: "Data livre • Válido por 90 dias",
-    heroImage: img("https://images.unsplash.com/photo-1544552866-d3ed42536cfd?w=1600", "Aquário"),
-    content: [],
-    status: "PUBLISHED",
-    attractionId: "attr-aquario",
-    composition: null,
-    fromPrice: money(6500),
-    passportPrice: null,
-    featured: true,
-    ...ts,
-  },
-  {
-    id: "prod-pao",
-    type: "SIMPLE",
-    slug: "bondinho-pao-de-acucar",
-    name: "Bondinho Pão de Açúcar",
-    tagline: "Data livre • Vista 360°",
-    heroImage: img("https://images.unsplash.com/photo-1518639192441-8fce0a366e2e?w=1600", "Pão de Açúcar"),
-    content: [],
-    status: "PUBLISHED",
-    attractionId: "attr-pao",
-    composition: null,
-    fromPrice: money(16000),
-    passportPrice: null,
-    featured: false,
-    ...ts,
-  },
-  {
-    id: "prod-passaporte-rio",
-    type: "PASSPORT",
-    slug: "passaporte-rio-essencial",
-    name: "Passaporte Rio Essencial",
-    tagline: "3 atrações icônicas em um único pedido",
-    heroImage: img("https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?w=1600", "Rio de Janeiro"),
-    content: [
-      { type: "paragraph", text: "Organize o essencial do Rio em um só passaporte: Cristo Redentor, Pão de Açúcar e AquaRio — com regras claras por atração e uma compra centralizada." },
-    ],
-    status: "PUBLISHED",
-    attractionId: null,
-    composition: {
-      items: [
-        { id: "pi-1", attractionId: "attr-corcovado", ticketTypeId: "tt-corcovado-inteira", quantity: 1, required: true, order: 1 },
-        { id: "pi-2", attractionId: "attr-pao", ticketTypeId: "tt-pao-inteira", quantity: 1, required: true, order: 2 },
-        { id: "pi-3", attractionId: "attr-aquario", ticketTypeId: "tt-aquario-inteira", quantity: 1, required: true, order: 3 },
-      ],
-    },
-    fromPrice: money(35000),
-    passportPrice: money(35000),
-    featured: true,
-    ...ts,
-  },
-];
+export const seedPartners = catalogPartners;
+export const seedAttractions = catalogAttractions;
+export const seedTicketTypes = catalogTicketTypes;
+export const seedProducts = catalogProducts;
 
 export const seedFulfillments: Fulfillment[] = [
   {
@@ -352,15 +110,15 @@ export const seedOrders: Order[] = [
         productType: "SIMPLE",
         productName: "AquaRio — Aquário Marinho",
         quantity: 2,
-        unitPrice: money(12000),
+        unitPrice: money(12300),
         visitDate: "2026-02-14",
         visitSlot: null,
         fulfillmentIds: ["ful-001"],
       },
     ],
-    subtotal: money(24000),
+    subtotal: money(24600),
     discount: money(0),
-    total: money(24000),
+    total: money(24600),
     payment: { provider: "mock", status: "PAID", method: "PIX" },
     hasManualFulfillment: true,
     ...ts,
@@ -377,7 +135,7 @@ export const seedOrders: Order[] = [
     items: [
       {
         id: "oi-2",
-        productId: "attr-amanha",
+        productId: "prod-amanha",
         productType: "SIMPLE",
         productName: "Museu do Amanhã",
         quantity: 4,
@@ -410,15 +168,15 @@ export const seedOrders: Order[] = [
         productType: "SIMPLE",
         productName: "AquaRio — Aquário Marinho",
         quantity: 1,
-        unitPrice: money(6000),
+        unitPrice: money(8100),
         visitDate: "2026-02-08",
         visitSlot: null,
         fulfillmentIds: ["ful-003"],
       },
     ],
-    subtotal: money(6000),
+    subtotal: money(8100),
     discount: money(0),
-    total: money(6000),
+    total: money(8100),
     payment: { provider: "mock", status: "PAID", method: "PIX" },
     hasManualFulfillment: true,
     ...ts,
@@ -435,7 +193,7 @@ export const seedSites: Site[] = [
       brand: "0 8 95",
       brandFg: "251 255 225",
       brandMuted: "255 93 6",
-      logoUrl: "",
+      logoUrl: "/brand/onerio-logo.png",
     },
     attractionIds: null,
     partnerId: null,

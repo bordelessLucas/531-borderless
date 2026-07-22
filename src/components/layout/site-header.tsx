@@ -6,6 +6,7 @@ import type { Site } from "@/features/tenant/types";
 import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { useAuth } from "@/features/auth/auth-provider";
 import { BrandMark } from "@/components/layout/brand-mark";
+import { resolveSiteLogoUrl } from "@/features/tenant/brand";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader({ site }: { site: Site }) {
@@ -15,7 +16,7 @@ export function SiteHeader({ site }: { site: Site }) {
     <header className="sticky top-0 z-40 border-b border-surface-border/80 bg-surface/92 backdrop-blur-md">
       <div className="container flex h-[4.5rem] items-center justify-between gap-4">
         <Link href="/" className="flex shrink-0 items-center" aria-label={site.name}>
-          <BrandMark name={site.name} logoUrl={site.theme.logoUrl || undefined} />
+          <BrandMark name={site.name} logoUrl={resolveSiteLogoUrl(site)} />
         </Link>
 
         <nav className="hidden items-center gap-9 text-[15px] font-medium text-ink-muted md:flex">

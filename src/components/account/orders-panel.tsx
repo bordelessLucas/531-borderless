@@ -9,7 +9,7 @@ import {
   where,
   type QueryConstraint,
 } from "firebase/firestore";
-import { Download, Ticket } from "lucide-react";
+import { Download } from "lucide-react";
 import { getDb } from "@/lib/firebase/client";
 import { COLLECTIONS } from "@/lib/firebase/collections";
 import { useAuth } from "@/features/auth/auth-provider";
@@ -19,6 +19,7 @@ import type { Fulfillment } from "@/features/fulfillment/types";
 import { formatMoney } from "@/features/shared/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BrandIcon } from "@/components/brand/icons";
 
 function asEntity<T extends { id: string }>(
   id: string,
@@ -72,6 +73,16 @@ const statusLabel: Record<string, string> = {
   REFUNDED: "Reembolsado",
 };
 
+const statusClass: Record<string, string> = {
+  COMPLETED: "bg-brand/10 text-brand",
+  PAID: "bg-brand/10 text-brand",
+  PROCESSING: "bg-brand-muted/15 text-brand-muted",
+  AWAITING_PAYMENT: "bg-brand-muted/15 text-brand-muted",
+  CANCELLED: "bg-ink/10 text-ink-muted",
+  REFUNDED: "bg-ink/10 text-ink-muted",
+  CART: "bg-surface-subtle text-ink-muted",
+};
+
 export function OrdersList() {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[] | null>(null);
@@ -106,8 +117,8 @@ export function OrdersList() {
   if (orders.length === 0) {
     return (
       <Card className="p-8 text-center">
-        <Ticket className="mx-auto h-10 w-10 text-ink-subtle" />
-        <h2 className="mt-3 font-display text-xl font-semibold text-ink">Nenhum pedido ainda</h2>
+        <BrandIcon id="chinelo" size="xl" tone="soft" className="mx-auto" />
+        <h2 className="mt-4 font-display text-xl font-semibold text-ink">Nenhum pedido ainda</h2>
         <p className="mt-1 text-sm text-ink-muted">
           {ONERIO_VOICE.account.ordersEmpty}
         </p>
@@ -133,7 +144,11 @@ export function OrdersList() {
                     {order.items.map((i) => i.productName).join(", ") || "Pedido"}
                   </p>
                   <p className="mt-1 text-sm text-ink-muted">
-                    {statusLabel[order.status] ?? order.status}
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusClass[order.status] ?? "bg-surface-subtle text-ink-muted"}`}
+                    >
+                      {statusLabel[order.status] ?? order.status}
+                    </span>
                     {order.createdAt
                       ? ` · ${new Date(order.createdAt).toLocaleDateString("pt-BR")}`
                       : null}

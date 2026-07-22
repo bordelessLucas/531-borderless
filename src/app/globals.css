@@ -5,6 +5,20 @@
 /* OneRio — Chillax (títulos) + Satoshi (texto). Fonte: Fontshare / livro da marca. */
 @font-face {
   font-family: "Chillax";
+  src: url("/fonts/chillax-300.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Chillax";
+  src: url("/fonts/chillax-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Chillax";
   src: url("/fonts/chillax-500.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
@@ -26,6 +40,13 @@
 }
 @font-face {
   font-family: "Satoshi";
+  src: url("/fonts/satoshi-300.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
   src: url("/fonts/satoshi-400.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
@@ -42,6 +63,13 @@
   font-family: "Satoshi";
   src: url("/fonts/satoshi-700.woff2") format("woff2");
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-900.woff2") format("woff2");
+  font-weight: 900;
   font-style: normal;
   font-display: swap;
 }

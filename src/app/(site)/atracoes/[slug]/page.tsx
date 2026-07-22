@@ -11,6 +11,7 @@ import {
 import { ContentBlocks } from "@/components/catalog/content-blocks";
 import { BookingPanel } from "@/components/booking/booking-panel";
 import { Badge } from "@/components/ui/card";
+import { BrandIcon } from "@/components/brand/icons";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -39,6 +40,12 @@ export default async function AtracaoPage({ params }: PageProps) {
         <Image src={attraction.heroImage.url} alt={attraction.heroImage.alt} fill priority className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="container relative flex h-full flex-col justify-end pb-8 text-white">
+          <div className="mb-2 flex items-center gap-3">
+            <BrandIcon id="camera" size="md" tone="soft" className="bg-white/15 text-white" />
+            <span className="rounded-full bg-brand-muted px-3 py-1 text-xs font-semibold text-white">
+              Atração
+            </span>
+          </div>
           <div className="flex flex-wrap gap-2">
             {attraction.highlights.map((h) => (
               <Badge key={h} className="bg-white/15 text-white backdrop-blur">{h}</Badge>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Site } from "@/features/tenant/types";
 import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { BrandMark } from "@/components/layout/brand-mark";
+import { resolveSiteLogoUrl } from "@/features/tenant/brand";
 
 export function SiteFooter({ site }: { site: Site }) {
   return (
@@ -10,7 +11,7 @@ export function SiteFooter({ site }: { site: Site }) {
         <div className="md:col-span-2">
           <BrandMark
             name={site.name}
-            logoUrl={site.theme.logoUrl || undefined}
+            logoUrl={resolveSiteLogoUrl(site)}
             inverted
           />
           <p className="mt-3 max-w-sm text-sm text-brand-fg/75">
