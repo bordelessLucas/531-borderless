@@ -32,6 +32,9 @@ export function PassportEditor({ product, attractions, ticketTypes }: PassportEd
   );
   const [content, setContent] = useState<ContentBlock[]>(product?.content ?? []);
   const [items, setItems] = useState<PassportItem[]>(product?.composition?.items ?? []);
+  const [minOptional, setMinOptional] = useState(
+    product?.composition?.minOptionalSelections ?? 0,
+  );
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -77,7 +80,10 @@ export function PassportEditor({ product, attractions, ticketTypes }: PassportEd
           heroImageUrl.trim() ||
           "https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?w=1600",
         content,
-        composition: { items: items.map((it, i) => ({ ...it, order: i + 1 })) },
+        composition: {
+          items: items.map((it, i) => ({ ...it, order: i + 1 })),
+          minOptionalSelections: minOptional > 0 ? minOptional : undefined,
+        },
         passportPriceAmount: amount,
         fromPriceAmount: amount,
         status,
@@ -131,11 +137,17 @@ export function PassportEditor({ product, attractions, ticketTypes }: PassportEd
           <div className="mt-4 space-y-3">
             {items.map((item, index) => {
               const tts = ticketsByAttraction(item.attractionId);
+              const selectedTt = ticketTypes.find((t) => t.id === item.ticketTypeId);
+              const attraction = attractions.find((a) => a.id === item.attractionId);
+              const partnerStrategy =
+                selectedTt?.strategy ??
+                null;
               return (
                 <div
                   key={item.id}
-                  className="grid gap-2 rounded-xl border border-surface-border p-3 sm:grid-cols-[1fr_1fr_80px_auto_auto]"
+                  className="space-y-2 rounded-xl border border-surface-border p-3"
                 >
+                  <div className="grid gap-2 sm:grid-cols-[1fr_1fr_80px_auto_auto]">
                   <select
                     value={item.attractionId}
                     onChange={(e) => {
@@ -175,6 +187,7 @@ export function PassportEditor({ product, attractions, ticketTypes }: PassportEd
                     {tts.map((tt) => (
                       <option key={tt.id} value={tt.id}>
                         {tt.name} ({formatMoney(tt.price)})
+                        {tt.strategy ? ` · ${tt.strategy}` : ""}
                       </option>
                     ))}
                   </select>
@@ -213,12 +226,52 @@ export function PassportEditor({ product, attractions, ticketTypes }: PassportEd
                   >
                     <Trash2 className="h-4 w-4 text-ink-subtle" />
                   </button>
+                  </div>
+                  <p className="text-xs text-ink-muted">
+                    Emissão deste item:{" "}
+                    <strong className="text-ink">
+                      {partnerStrategy === "API"
+                        ? "API (automática)"
+                        : partnerStrategy === "MANUAL"
+                          ? "Manual (fila)"
+                          : "Herdada do parceiro da atração"}
+                    </strong>
+                    {attraction ? (
+                      <>
+                        {" "}
+                        — configure em{" "}
+                        <a
+                          href={`/admin/atracoes/${attraction.id}`}
+                          className="text-brand hover:underline"
+                        >
+                          {attraction.name}
+                        </a>
+                      </>
+                    ) : null}
+                  </p>
                 </div>
               );
             })}
             {items.length === 0 ? (
               <p className="text-sm text-ink-subtle">Adicione atrações à composição.</p>
             ) : null}
+          </div>
+
+          <div className="mt-5 rounded-xl border border-dashed border-surface-border p-4">
+            <label className="block text-sm font-medium text-ink">
+              Mínimo de itens opcionais (escolha N de M)
+            </label>
+            <p className="mt-1 text-xs text-ink-muted">
+              Se houver itens não obrigatórios, o cliente precisa escolher pelo menos este
+              número. Deixe 0 para não exigir.
+            </p>
+            <input
+              type="number"
+              min={0}
+              value={minOptional}
+              onChange={(e) => setMinOptional(Number(e.target.value) || 0)}
+              className="mt-2 h-10 w-28 rounded-lg border border-surface-border px-3 text-sm"
+            />
           </div>
         </Card>
 

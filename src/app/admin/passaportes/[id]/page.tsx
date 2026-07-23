@@ -12,6 +12,15 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+export async function generateStaticParams() {
+  const { listAllProducts } = await import("@/lib/repository");
+  const products = await listAllProducts();
+  return [
+    { id: "novo" },
+    ...products.filter((p) => p.type === "PASSPORT").map((p) => ({ id: p.id })),
+  ];
+}
+
 export default async function PassportEditorPage({ params }: PageProps) {
   const { id } = await params;
   const isNew = id === "novo";

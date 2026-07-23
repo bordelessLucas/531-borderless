@@ -3,7 +3,6 @@ import { getCurrentSite } from "@/features/tenant/server";
 import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { listProductsForSite } from "@/lib/repository";
 import { ProductCard } from "@/components/catalog/product-card";
-import { BrandIcon } from "@/components/brand/icons";
 import type { Product } from "@/features/catalog/types";
 import {
   ATTRACTION_CATEGORY_ORDER,
@@ -42,23 +41,25 @@ export default async function AtracoesPage() {
   const groups = groupByCategory(attractions);
 
   return (
-    <div className="container py-12">
-      <header className="mb-10 max-w-2xl">
-        <div className="mb-3 flex items-center gap-3">
-          <BrandIcon id="camera" size="md" tone="soft" />
-          <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
-            Experiências
-          </span>
+    <div className="bg-surface">
+      <div className="bg-brand-muted py-10 md:py-14">
+        <div className="container text-center">
+          <h1 className="heading-display text-3xl text-brand-fg md:text-5xl">
+            TODAS AS ATRAÇÕES
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-brand-fg/90">
+            {ONERIO_VOICE.attractions.support}
+          </p>
         </div>
-        <h1 className="heading-section text-4xl">{ONERIO_VOICE.attractions.title}</h1>
-        <p className="mt-2 text-ink-muted">{ONERIO_VOICE.attractions.support}</p>
-      </header>
+      </div>
 
-      <div className="space-y-14">
+      <div className="container space-y-14 py-12 md:py-16">
         {groups.map((group) => (
           <section key={group.id}>
-            <h2 className="heading-section text-2xl">{group.label}</h2>
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <h2 className="heading-display text-center text-2xl text-brand md:text-left md:text-3xl">
+              {group.label}
+            </h2>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {group.items.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

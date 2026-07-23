@@ -12,6 +12,12 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+export async function generateStaticParams() {
+  const { listSites } = await import("@/lib/repository");
+  const sites = await listSites();
+  return [{ id: "novo" }, ...sites.map((s) => ({ id: s.id }))];
+}
+
 export default async function SiteEditorPage({ params }: PageProps) {
   const { id } = await params;
   const isNew = id === "novo";

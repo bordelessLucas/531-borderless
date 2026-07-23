@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { getServerSession } from "@/features/auth/server";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,12 +8,25 @@ export const metadata: Metadata = { title: "Minha conta" };
 
 export default async function ContaPage() {
   const session = await getServerSession();
-  if (!session) redirect("/login?next=/conta");
+
+  if (!session) {
+    return (
+      <div className="container py-20 text-center">
+        <h1 className="font-display text-2xl font-semibold text-ink">Minha conta</h1>
+        <p className="mt-2 text-ink-muted">Entre para ver pedidos e bilhetes.</p>
+        <Link href="/login?next=/conta" className="mt-6 inline-block">
+          <Button>Entrar</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-12">
       <header className="mb-8">
-        <h1 className="font-display text-3xl font-semibold text-ink">Olá, {session.name ?? "cliente"}</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink">
+          Olá, {session.name ?? "cliente"}
+        </h1>
         <p className="mt-1 text-ink-muted">{session.email}</p>
       </header>
 

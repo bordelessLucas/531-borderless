@@ -23,10 +23,12 @@ export const ONERIO_BRAND = {
   trilhaAbertaHex: "#2BEB04",
 } as const;
 
-/** Wordmark oficial (fundo transparente) — Solo Nativo. */
-export const ONERIO_LOGO_URL = "/brand/onerio-logo.png";
-/** Wordmark para fundos escuros (ex.: footer brand) — Luz do Dia. */
-export const ONERIO_LOGO_LIGHT_URL = "/brand/onerio-logo-light.png";
+/** Wordmark oficial do site (header/footer em fundo Noite Fresca). */
+export const ONERIO_LOGO_URL = "/brand/onerio-logo-site.png";
+/** Wordmark claro legado — mesmo asset do site (já pensado para fundo escuro). */
+export const ONERIO_LOGO_LIGHT_URL = "/brand/onerio-logo-site.png";
+/** Símbolo / marca quadrada (footer). */
+export const ONERIO_LOGO_MARK_URL = "/brand/onerio-logo-mark.png";
 
 /** Tema default do site principal OneRio. */
 export const ONERIO_SITE_THEME = {
@@ -41,7 +43,7 @@ export function resolveSiteLogoUrl(site: {
   slug: string;
   theme: { logoUrl: string };
 }): string | undefined {
-  if (site.theme.logoUrl) return site.theme.logoUrl;
   if (site.slug === "onerio") return ONERIO_LOGO_URL;
+  if (site.theme.logoUrl) return site.theme.logoUrl;
   return undefined;
 }

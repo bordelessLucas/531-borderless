@@ -12,7 +12,8 @@
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
     "promote-admin": "tsx --env-file=.env.local scripts/promote-admin.ts",
     "emulators": "firebase emulators:start",
-    "firebase:rules": "npx -y firebase-tools@latest deploy --only firestore:rules,storage"
+    "firebase:rules": "npx -y firebase-tools@latest deploy --only firestore:rules,storage",
+    "deploy:hosting": "bash scripts/deploy-static.sh"
   },
   "repository": {
     "type": "git",

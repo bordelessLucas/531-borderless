@@ -5,10 +5,12 @@ import type { Site } from "@/features/tenant/types";
 
 /**
  * Resolve o site (tenant) a partir do Host da requisição.
- * Base da arquitetura multi-site / whitelabel: o mesmo código serve OneRio e
- * qualquer site de parceiro, mudando apenas o recorte de catálogo e o tema.
+ * Em export estático (Hosting Spark), usa o site default — sem headers().
  */
 export async function getCurrentSite(): Promise<Site> {
+  if (process.env.STATIC_EXPORT === "1") {
+    return await getSiteByHost(null);
+  }
   const headerList = await headers();
   const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
   return await getSiteByHost(host);

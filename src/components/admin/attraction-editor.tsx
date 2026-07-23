@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, ExternalLink } from "lucide-react";
 import type {
   Attraction,
   AvailabilityPolicy,
@@ -11,6 +12,8 @@ import type {
 } from "@/features/attractions/types";
 import type { Partner } from "@/features/partners/types";
 import type { PublishStatus } from "@/features/shared/types";
+import type { Product } from "@/features/catalog/types";
+import { PRODUCT_CATEGORY_LABELS } from "@/features/catalog/categories";
 import { saveAttractionDraft } from "@/features/attractions/staff-writes";
 import {
   AvailabilityEditor,
@@ -25,12 +28,19 @@ interface AttractionEditorProps {
   attraction: Attraction | null;
   partners: Partner[];
   ticketTypes: TicketType[];
+  /** Product SIMPLE vinculado (se já existir). */
+  linkedProduct?: Product | null;
 }
+
+const CATEGORY_OPTIONS = Object.entries(PRODUCT_CATEGORY_LABELS).filter(
+  ([key]) => key !== "passaporte",
+);
 
 export function AttractionEditor({
   attraction,
   partners,
   ticketTypes,
+  linkedProduct = null,
 }: AttractionEditorProps) {
   const router = useRouter();
   const [name, setName] = useState(attraction?.name ?? "");
@@ -44,6 +54,16 @@ export function AttractionEditor({
   );
   const [heroImageUrl, setHeroImageUrl] = useState(attraction?.heroImage.url ?? "");
   const [status, setStatus] = useState<PublishStatus>(attraction?.status ?? "DRAFT");
+  const [featured, setFeatured] = useState(linkedProduct?.featured ?? false);
+  const [category, setCategory] = useState<Product["category"]>(
+    linkedProduct?.category ?? "familia",
+  );
+  const [highlightsText, setHighlightsText] = useState(
+    (attraction?.highlights ?? []).join("\n"),
+  );
+  const [usageRulesText, setUsageRulesText] = useState(
+    (attraction?.usageRules ?? []).join("\n"),
+  );
   const [availability, setAvailability] = useState<AvailabilityPolicy>(
     attraction?.availability ?? defaultAvailability(),
   );
@@ -59,6 +79,15 @@ export function AttractionEditor({
     setBusy(true);
     setMessage(null);
     try {
+      const highlights = highlightsText
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const usageRules = usageRulesText
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
       const id = await saveAttractionDraft({
         id: attraction?.id,
         partnerId,
@@ -71,15 +100,25 @@ export function AttractionEditor({
           "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1600",
         availability,
         content,
-        highlights: attraction?.highlights ?? [],
-        usageRules: attraction?.usageRules ?? [],
+        highlights,
+        usageRules,
         status,
+        featured,
+        category,
         metaTitle: attraction?.metaTitle,
         metaDescription: attraction?.metaDescription,
       });
-      setMessage({ ok: true, text: "Atração salva." });
+      setMessage({
+        ok: true,
+        text:
+          status === "PUBLISHED"
+            ? "Atração salva e produto publicado na vitrine."
+            : "Atração salva. Publique para aparecer na loja.",
+      });
       if (!attraction) {
         router.replace(`/admin/atracoes/${id}`);
+        router.refresh();
+      } else {
         router.refresh();
       }
     } catch (err) {
@@ -94,6 +133,8 @@ export function AttractionEditor({
       setBusy(false);
     }
   }
+
+  const storefrontHref = `/atracoes/${slug.trim() || attraction?.slug || ""}`;
 
   return (
     <div className="space-y-6">
@@ -121,7 +162,23 @@ export function AttractionEditor({
                 >
                   {partners.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name}
+                      {p.name} ({p.defaultStrategy === "API" ? "API" : "Manual"})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="text-sm font-medium text-ink">Categoria na vitrine</span>
+                <select
+                  value={category ?? ""}
+                  onChange={(e) =>
+                    setCategory((e.target.value || undefined) as Product["category"])
+                  }
+                  className="mt-1.5 h-11 w-full rounded-xl border border-surface-border bg-surface px-3.5 text-sm"
+                >
+                  {CATEGORY_OPTIONS.map(([key, label]) => (
+                    <option key={key} value={key}>
+                      {label}
                     </option>
                   ))}
                 </select>
@@ -133,6 +190,26 @@ export function AttractionEditor({
                   onChange={setHeroImageUrl}
                 />
               </div>
+              <label className="block sm:col-span-2">
+                <span className="text-sm font-medium text-ink">Destaques (1 por linha)</span>
+                <textarea
+                  value={highlightsText}
+                  onChange={(e) => setHighlightsText(e.target.value)}
+                  rows={3}
+                  className="mt-1.5 w-full rounded-xl border border-surface-border bg-surface px-3.5 py-2.5 text-sm"
+                  placeholder="Vista panorâmica&#10;Ideal para famílias"
+                />
+              </label>
+              <label className="block sm:col-span-2">
+                <span className="text-sm font-medium text-ink">Regras de uso (1 por linha)</span>
+                <textarea
+                  value={usageRulesText}
+                  onChange={(e) => setUsageRulesText(e.target.value)}
+                  rows={3}
+                  className="mt-1.5 w-full rounded-xl border border-surface-border bg-surface px-3.5 py-2.5 text-sm"
+                  placeholder="Documento com foto&#10;Não reembolsável"
+                />
+              </label>
             </div>
           </Card>
 
@@ -143,6 +220,9 @@ export function AttractionEditor({
         <div className="space-y-6">
           <Card className="p-6">
             <h2 className="font-display text-lg font-semibold text-ink">Publicação</h2>
+            <p className="mt-1 text-xs text-ink-muted">
+              Ao salvar, o produto da vitrine é criado/atualizado automaticamente.
+            </p>
             <label className="mt-4 block">
               <span className="text-sm font-medium text-ink">Status</span>
               <select
@@ -155,9 +235,26 @@ export function AttractionEditor({
                 <option value="ARCHIVED">Arquivada</option>
               </select>
             </label>
+            <label className="mt-3 flex items-center gap-2 text-sm text-ink">
+              <input
+                type="checkbox"
+                checked={featured}
+                onChange={(e) => setFeatured(e.target.checked)}
+              />
+              Destaque na home
+            </label>
             <Button className="mt-5 w-full" disabled={busy} onClick={() => void onSave()}>
               {busy ? "Salvando…" : "Salvar atração"}
             </Button>
+            {attraction && slug ? (
+              <Link
+                href={storefrontHref}
+                target="_blank"
+                className="mt-3 flex items-center justify-center gap-1.5 text-sm font-medium text-brand hover:underline"
+              >
+                Ver na loja <ExternalLink className="h-3.5 w-3.5" />
+              </Link>
+            ) : null}
             {message ? (
               <p
                 className={`mt-3 flex items-start gap-2 rounded-lg px-3 py-2 text-xs ${
@@ -172,6 +269,14 @@ export function AttractionEditor({
                 {message.text}
               </p>
             ) : null}
+          </Card>
+
+          <Card className="p-5">
+            <h3 className="text-sm font-semibold text-ink">Emissão</h3>
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+              A forma de emissão (Manual ou API) vem do <strong>parceiro</strong> e pode ser
+              sobrescrita em cada ingresso abaixo. Pedidos manuais caem na fila do admin.
+            </p>
           </Card>
         </div>
       </div>

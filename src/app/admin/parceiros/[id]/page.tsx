@@ -8,6 +8,12 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+export async function generateStaticParams() {
+  const { listPartners } = await import("@/lib/repository");
+  const partners = await listPartners();
+  return [{ id: "novo" }, ...partners.map((p) => ({ id: p.id }))];
+}
+
 export default async function PartnerEditorPage({ params }: PageProps) {
   const { id } = await params;
   const isNew = id === "novo";

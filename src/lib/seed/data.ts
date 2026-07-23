@@ -193,7 +193,7 @@ export const seedSites: Site[] = [
       brand: "0 8 95",
       brandFg: "251 255 225",
       brandMuted: "255 93 6",
-      logoUrl: "/brand/onerio-logo.png",
+      logoUrl: "/brand/onerio-logo-site.png",
     },
     attractionIds: null,
     partnerId: null,

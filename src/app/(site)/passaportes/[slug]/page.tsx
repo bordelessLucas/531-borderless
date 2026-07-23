@@ -33,6 +33,14 @@ const strategyLabel: Record<FulfillmentStrategy, { icon: typeof Cpu; label: stri
   MANUAL: { icon: UserCog, label: "Emissão pela equipe" },
 };
 
+export async function generateStaticParams() {
+  const { listAllProducts } = await import("@/lib/repository");
+  const products = await listAllProducts();
+  return products
+    .filter((p) => p.type === "PASSPORT" && p.status === "PUBLISHED")
+    .map((p) => ({ slug: p.slug }));
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const site = await getCurrentSite();

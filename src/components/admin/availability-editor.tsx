@@ -236,7 +236,12 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
 
       <div className="mt-6">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-ink">Temporadas</p>
+          <div>
+            <p className="text-sm font-medium text-ink">Temporadas</p>
+            <p className="text-xs text-ink-subtle">
+              Períodos com slots e/ou ajuste de preço (%).
+            </p>
+          </div>
           <Button type="button" size="sm" variant="outline" onClick={addSeason}>
             <Plus className="h-4 w-4" /> Temporada
           </Button>
@@ -245,26 +250,115 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
           {value.seasons.map((s) => (
             <div
               key={s.id}
-              className="grid gap-2 rounded-xl border border-surface-border p-3 sm:grid-cols-3"
+              className="space-y-3 rounded-xl border border-surface-border p-3"
             >
-              <input
-                value={s.label}
-                onChange={(e) => updateSeason(s.id, { label: e.target.value })}
-                className="h-10 rounded-lg border border-surface-border px-3 text-sm sm:col-span-3"
-                placeholder="Label"
-              />
-              <input
-                type="date"
-                value={s.from}
-                onChange={(e) => updateSeason(s.id, { from: e.target.value })}
-                className="h-10 rounded-lg border border-surface-border px-3 text-sm"
-              />
-              <input
-                type="date"
-                value={s.to}
-                onChange={(e) => updateSeason(s.id, { to: e.target.value })}
-                className="h-10 rounded-lg border border-surface-border px-3 text-sm"
-              />
+              <div className="grid gap-2 sm:grid-cols-3">
+                <input
+                  value={s.label}
+                  onChange={(e) => updateSeason(s.id, { label: e.target.value })}
+                  className="h-10 rounded-lg border border-surface-border px-3 text-sm sm:col-span-3"
+                  placeholder="Label (ex.: Alta temporada)"
+                />
+                <input
+                  type="date"
+                  value={s.from}
+                  onChange={(e) => updateSeason(s.id, { from: e.target.value })}
+                  className="h-10 rounded-lg border border-surface-border px-3 text-sm"
+                />
+                <input
+                  type="date"
+                  value={s.to}
+                  onChange={(e) => updateSeason(s.id, { to: e.target.value })}
+                  className="h-10 rounded-lg border border-surface-border px-3 text-sm"
+                />
+                <label className="block">
+                  <span className="text-xs text-ink-muted">Ajuste preço (%)</span>
+                  <input
+                    type="number"
+                    step={1}
+                    value={
+                      s.priceAdjustmentBps != null
+                        ? Math.round(s.priceAdjustmentBps / 100)
+                        : ""
+                    }
+                    placeholder="0"
+                    onChange={(e) => {
+                      const pct = e.target.value;
+                      updateSeason(s.id, {
+                        priceAdjustmentBps: pct === "" ? undefined : Number(pct) * 100,
+                      });
+                    }}
+                    className="mt-1 h-10 w-full rounded-lg border border-surface-border px-3 text-sm"
+                  />
+                </label>
+              </div>
+              {value.mode === "SCHEDULED" ? (
+                <div>
+                  <p className="text-xs font-medium text-ink-muted">
+                    Slots desta temporada (vazio = usa padrão)
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {(s.slots ?? []).map((slot) => (
+                      <span
+                        key={slot.start}
+                        className="inline-flex items-center gap-2 rounded-lg bg-surface-subtle px-3 py-1.5 text-sm"
+                      >
+                        {slot.start} · cap. {slot.capacity}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateSeason(s.id, {
+                              slots: (s.slots ?? []).filter((x) => x.start !== slot.start),
+                            })
+                          }
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-ink-subtle" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <input
+                      type="time"
+                      id={`season-slot-${s.id}`}
+                      className="h-9 rounded-lg border border-surface-border px-2 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        const input = e.currentTarget;
+                        const start = input.value;
+                        if (!/^\d{2}:\d{2}$/.test(start)) return;
+                        const nextSlots = [
+                          ...(s.slots ?? []).filter((x) => x.start !== start),
+                          { start, capacity: 50 },
+                        ].sort((a, b) => a.start.localeCompare(b.start));
+                        updateSeason(s.id, { slots: nextSlots });
+                        input.value = "";
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const input = document.getElementById(
+                          `season-slot-${s.id}`,
+                        ) as HTMLInputElement | null;
+                        const start = input?.value ?? "";
+                        if (!/^\d{2}:\d{2}$/.test(start)) return;
+                        const nextSlots = [
+                          ...(s.slots ?? []).filter((x) => x.start !== start),
+                          { start, capacity: 50 },
+                        ].sort((a, b) => a.start.localeCompare(b.start));
+                        updateSeason(s.id, { slots: nextSlots });
+                        if (input) input.value = "";
+                      }}
+                    >
+                      <Plus className="h-4 w-4" /> Slot temporada
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
               <Button
                 type="button"
                 size="sm"
@@ -276,7 +370,7 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
                   })
                 }
               >
-                Remover
+                Remover temporada
               </Button>
             </div>
           ))}

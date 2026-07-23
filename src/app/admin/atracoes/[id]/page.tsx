@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import {
   getAttractionById,
+  listAllProducts,
   listPartners,
   listTicketTypesByAttractionAdmin,
 } from "@/lib/repository";
@@ -10,6 +11,12 @@ import { AttractionEditor } from "@/components/admin/attraction-editor";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateStaticParams() {
+  const { listAllAttractions } = await import("@/lib/repository");
+  const attractions = await listAllAttractions();
+  return [{ id: "nova" }, ...attractions.map((a) => ({ id: a.id }))];
 }
 
 export default async function AttractionEditorPage({ params }: PageProps) {
@@ -21,6 +28,11 @@ export default async function AttractionEditorPage({ params }: PageProps) {
   const ticketTypes = attraction
     ? await listTicketTypesByAttractionAdmin(attraction.id)
     : [];
+  const linkedProduct = attraction
+    ? (await listAllProducts()).find(
+        (p) => p.type === "SIMPLE" && p.attractionId === attraction.id,
+      ) ?? null
+    : null;
 
   return (
     <div>
@@ -37,6 +49,7 @@ export default async function AttractionEditorPage({ params }: PageProps) {
         attraction={attraction}
         partners={partners}
         ticketTypes={ticketTypes}
+        linkedProduct={linkedProduct}
       />
     </div>
   );

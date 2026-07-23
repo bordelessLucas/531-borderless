@@ -12,9 +12,18 @@ import { ContentBlocks } from "@/components/catalog/content-blocks";
 import { BookingPanel } from "@/components/booking/booking-panel";
 import { Badge } from "@/components/ui/card";
 import { BrandIcon } from "@/components/brand/icons";
+import { resolveProductImage } from "@/lib/onerio-assets";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateStaticParams() {
+  const { listAllProducts } = await import("@/lib/repository");
+  const products = await listAllProducts();
+  return products
+    .filter((p) => p.type === "SIMPLE" && p.status === "PUBLISHED")
+    .map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -33,11 +42,12 @@ export default async function AtracaoPage({ params }: PageProps) {
   const attraction = await getAttractionById(product.attractionId);
   if (!attraction) notFound();
   const ticketTypes = await getTicketTypesByAttraction(attraction.id);
+  const hero = resolveProductImage(product.slug, attraction.heroImage);
 
   return (
     <div>
       <div className="relative h-[380px]">
-        <Image src={attraction.heroImage.url} alt={attraction.heroImage.alt} fill priority className="object-cover" />
+        <Image src={hero.url} alt={hero.alt} fill priority className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="container relative flex h-full flex-col justify-end pb-8 text-white">
           <div className="mb-2 flex items-center gap-3">

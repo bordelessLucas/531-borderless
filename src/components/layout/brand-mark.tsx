@@ -1,14 +1,9 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import {
-  ONERIO_LOGO_LIGHT_URL,
-  ONERIO_LOGO_URL,
-} from "@/features/tenant/brand";
-
 interface BrandMarkProps {
   name: string;
   logoUrl?: string;
-  /** Variante clara para fundos escuros (hero/footer brand). */
+  /** Mantido por compatibilidade; logo do site já funciona em fundo Noite Fresca. */
   inverted?: boolean;
   className?: string;
   size?: "sm" | "md";
@@ -25,19 +20,14 @@ export function BrandMark({
   size = "md",
 }: BrandMarkProps) {
   if (logoUrl) {
-    const src =
-      inverted && (logoUrl === ONERIO_LOGO_URL || logoUrl.endsWith("/onerio-logo.png"))
-        ? ONERIO_LOGO_LIGHT_URL
-        : logoUrl;
-
     return (
       <span className={cn("relative inline-flex items-center", className)}>
         <Image
-          src={src}
+          src={logoUrl}
           alt={name}
           width={size === "sm" ? 140 : 168}
           height={size === "sm" ? 45 : 54}
-          className="h-7 w-auto object-contain md:h-8"
+          className="h-8 w-auto object-contain md:h-9"
           unoptimized
           priority
         />

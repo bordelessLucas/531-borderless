@@ -85,8 +85,9 @@
   --brand-fg: 251 255 225;
   --brand-muted: 255 93 6;
 
+  /* Fundo do site oficial (Luz do Dia) + cartões brancos */
   --surface: 251 255 225;
-  --surface-subtle: 244 248 214;
+  --surface-subtle: 255 255 255;
   --surface-border: 220 226 180;
 
   --ink: 43 15 13;

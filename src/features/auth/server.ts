@@ -84,6 +84,9 @@ export async function getServerSession(): Promise<{
   name: string | null;
   role: UserRole;
 } | null> {
+  // Export estático (Firebase Hosting Spark): sem cookies no build.
+  if (process.env.STATIC_EXPORT === "1") return null;
+
   const jar = await cookies();
   const token = jar.get(AUTH_COOKIES.session)?.value;
   if (!token) return null;
