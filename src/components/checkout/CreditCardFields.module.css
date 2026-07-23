@@ -1,0 +1,337 @@
+.modal {
+  width: 100%;
+  height: fit-content;
+  max-width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #ffffff;
+  box-shadow:
+    0px 187px 75px rgba(0, 0, 0, 0.01),
+    0px 105px 63px rgba(0, 0, 0, 0.05),
+    0px 47px 47px rgba(0, 0, 0, 0.09),
+    0px 12px 26px rgba(0, 0, 0, 0.1),
+    0px 0px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 26px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.paymentOptions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.optionBtn {
+  height: 55px;
+  background: #f2f2f2;
+  border-radius: 11px;
+  padding: 0 10px;
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1b1b1b;
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.optionBtn:hover,
+.optionBtn:focus-visible {
+  box-shadow: 0 0 0 2px #242424;
+}
+
+.optionBtnActive {
+  background: #00085f;
+  color: #fbffe1;
+  box-shadow: 0 0 0 2px #00085f;
+}
+
+.optionBtnActive:hover,
+.optionBtnActive:focus-visible {
+  box-shadow: 0 0 0 2px #00085f, 0 0 0 4px rgba(0, 8, 95, 0.25);
+}
+
+.optionBtn svg {
+  height: 18px;
+  width: auto;
+  max-width: 92%;
+}
+
+.optionBtn:nth-child(2) svg {
+  height: 22px;
+}
+
+.optionBtnActive .monoLogo {
+  fill: #fbffe1;
+}
+
+.googlePayBtn.optionBtnActive {
+  background: #f2f2f2;
+  color: #1b1b1b;
+  box-shadow: 0 0 0 2px #00085f;
+}
+
+.pixMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #32bcad;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.optionBtnActive .pixMark {
+  background: #fbffe1;
+  color: #00085f;
+}
+
+.walletPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px;
+  text-align: center;
+}
+
+.walletTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.walletDesc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #8b8e98;
+  max-width: 28rem;
+}
+
+.separator {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 10px;
+  color: #8b8e98;
+}
+
+.separator > p {
+  word-break: keep-all;
+  display: block;
+  text-align: center;
+  font-weight: 600;
+  font-size: 11px;
+  margin: auto;
+}
+
+.line {
+  display: inline-block;
+  width: 100%;
+  height: 1px;
+  border: 0;
+  background-color: #e8e8e8;
+  margin: auto;
+}
+
+.creditCardInfoForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.inputContainer {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 4fr 2fr;
+  gap: 15px;
+}
+
+.split input {
+  width: 100%;
+}
+
+.inputLabel {
+  font-size: 10px;
+  color: #8b8e98;
+  font-weight: 600;
+}
+
+.inputField {
+  width: auto;
+  height: 40px;
+  padding: 0 0 0 16px;
+  border-radius: 9px;
+  outline: none;
+  background-color: #f2f2f2;
+  border: 1px solid #e5e5e500;
+  transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  font-family: inherit;
+  font-size: 13px;
+  color: #1b1b1b;
+}
+
+.inputField::placeholder {
+  color: #8b8e98;
+}
+
+.inputField:focus {
+  border: 1px solid transparent;
+  box-shadow: 0px 0px 0px 2px #242424;
+  background-color: transparent;
+}
+
+.pixPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 4px 4px;
+  text-align: center;
+}
+
+.qrBox {
+  width: 168px;
+  height: 168px;
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, #1b1b1b 25%, transparent 25%) 0 0 / 14px 14px,
+    linear-gradient(#1b1b1b 25%, transparent 25%) 0 0 / 14px 14px,
+    #f2f2f2;
+  border: 1px solid #e8e8e8;
+  display: grid;
+  place-items: center;
+}
+
+.qrInner {
+  width: 118px;
+  height: 118px;
+  border-radius: 8px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: #32bcad;
+  letter-spacing: 0.02em;
+}
+
+.pixTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.pixDesc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #8b8e98;
+  max-width: 28rem;
+}
+
+.pixCodeRow {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+}
+
+.pixCode {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  border-radius: 9px;
+  border: 1px solid #e8e8e8;
+  background: #f2f2f2;
+  padding: 0 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  color: #1b1b1b;
+}
+
+.copyBtn {
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  background: #00085f;
+  color: #fbffe1;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.copyBtn:hover,
+.copyBtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #2beb04;
+}
+
+.purchaseBtn {
+  width: 100%;
+  height: 55px;
+  border-radius: 11px;
+  border: 0;
+  outline: none;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  background: linear-gradient(180deg, #363636 0%, #1b1b1b 50%, #000000 100%);
+  transition: all 0.3s cubic-bezier(0.15, 0.83, 0.66, 1);
+  cursor: pointer;
+}
+
+.purchaseBtn:hover:not(:disabled) {
+  box-shadow: 0px 0px 0px 2px #ffffff, 0px 0px 0px 4px #0000003a;
+}
+
+.purchaseBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #8b8e98;
+  text-align: center;
+}
+
+.inputField::-webkit-outer-spin-button,
+.inputField::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inputField[type="number"] {
+  -moz-appearance: textfield;
+}

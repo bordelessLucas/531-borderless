@@ -58,7 +58,7 @@ export function BookingPanel({
   };
 
   return (
-    <Card className="sticky top-24 p-7 shadow-float md:p-8">
+    <Card className="sticky top-24 border-surface-border bg-surface p-7 shadow-float md:p-8">
       {availability.mode !== "OPEN" ? (
         <div>
           <p className="text-sm font-semibold text-ink">Escolha a data</p>
@@ -67,7 +67,7 @@ export function BookingPanel({
               Nenhuma data disponível no momento (calendário/lead time).
             </p>
           ) : (
-            <div className="mt-4 flex gap-2.5 overflow-x-auto pb-1">
+            <div className="scrollbar-brand mt-4 flex gap-2.5 overflow-x-auto pb-2">
               {dates.map((d) => (
                 <button
                   key={d.iso}
@@ -81,7 +81,7 @@ export function BookingPanel({
                     "min-w-[4.5rem] shrink-0 rounded-2xl border px-3.5 py-3 text-center text-sm capitalize transition-all duration-150",
                     date === d.iso
                       ? "border-brand bg-brand text-brand-fg shadow-sm"
-                      : "border-surface-border text-ink-muted hover:border-brand/40 hover:text-ink",
+                      : "border-surface-border bg-surface-subtle text-ink-muted hover:border-brand/40 hover:text-ink",
                   )}
                 >
                   {d.label}
@@ -124,11 +124,13 @@ export function BookingPanel({
         {ticketTypes.map((tt) => (
           <div
             key={tt.id}
-            className="flex items-center justify-between gap-4 rounded-2xl border border-surface-border/70 bg-surface-subtle/50 px-4 py-3.5"
+            className="flex items-center justify-between gap-4 rounded-2xl border border-surface-border/70 bg-surface-subtle px-4 py-3.5"
           >
             <div className="min-w-0">
               <p className="text-[15px] font-semibold text-ink">{tt.name}</p>
-              <p className="mt-0.5 text-sm text-ink-muted">{formatMoney(tt.price)}</p>
+              <p className="mt-0.5 text-sm font-semibold text-ink">
+                {formatMoney(tt.price)}
+              </p>
             </div>
             <QuantityStepper
               value={qty[tt.id] ?? 0}

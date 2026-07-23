@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, CreditCard, Loader2, QrCode } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { formatMoney, money, type Money } from "@/features/shared/types";
 import type { Product } from "@/features/catalog/types";
 import {
@@ -13,7 +13,13 @@ import { useAuth } from "@/features/auth/auth-provider";
 import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import {
+  CreditCardFields,
+  toOrderPaymentMethod,
+  type CreditCardValues,
+  type PaymentMethod,
+} from "@/components/checkout/CreditCardFields";
+import { PaymentSuccess } from "@/components/checkout/PaymentSuccess";
 
 export interface CheckoutLine {
   label: string;
@@ -23,8 +29,6 @@ export interface CheckoutLine {
   ticketTypeId?: string;
 }
 
-type Method = "PIX" | "CREDIT_CARD";
-
 interface CheckoutFormProps {
   lines: CheckoutLine[];
   total: Money;
@@ -32,6 +36,23 @@ interface CheckoutFormProps {
   product: Product;
   visitDate: string | null;
   visitSlot: string | null;
+}
+
+function paymentLabel(method: PaymentMethod): string {
+  switch (method) {
+    case "PIX":
+      return "Pix";
+    case "APPLE_PAY":
+      return "Apple Pay";
+    case "GOOGLE_PAY":
+      return "Google Pay";
+    default:
+      return "cartão";
+  }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 export function CheckoutForm({
@@ -43,11 +64,20 @@ export function CheckoutForm({
   visitSlot,
 }: CheckoutFormProps) {
   const { user, isLoading: authLoading } = useAuth();
-  const [method, setMethod] = useState<Method>("PIX");
+  const [method, setMethod] = useState<PaymentMethod>("CREDIT_CARD");
   const [submitting, setSubmitting] = useState(false);
+  const [phase, setPhase] = useState<"idle" | "paying" | "saving">("idle");
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ orderId: string } | null>(null);
+  const [result, setResult] = useState<{ orderId: string; method: PaymentMethod } | null>(
+    null,
+  );
   const [form, setForm] = useState({ name: "", email: "", phone: "", document: "" });
+  const [card, setCard] = useState<CreditCardValues>({
+    cardName: "",
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+  });
 
   useEffect(() => {
     if (!user) return;
@@ -58,8 +88,6 @@ export function CheckoutForm({
     }));
   }, [user]);
 
-  const valid = form.name && form.email.includes("@") && form.phone.length >= 8;
-
   async function onSubmit() {
     if (!user) {
       setError("Faça login para finalizar a compra.");
@@ -68,6 +96,11 @@ export function CheckoutForm({
     setSubmitting(true);
     setError(null);
     try {
+      // Simulação mocada: qualquer método/dado é aprovado.
+      setPhase("paying");
+      await sleep(1400);
+
+      setPhase("saving");
       const ticketLines: CheckoutTicketLine[] = lines.map((l) => ({
         ticketTypeId: l.ticketTypeId ?? "",
         quantity: l.quantity,
@@ -80,52 +113,37 @@ export function CheckoutForm({
         siteId,
         product,
         customer: {
-          name: form.name.trim(),
-          email: form.email.trim().toLowerCase(),
-          phone: form.phone.trim(),
+          name: form.name.trim() || user.displayName || "Cliente OneRio",
+          email: (form.email.trim() || user.email || "cliente@onerio.demo").toLowerCase(),
+          phone: form.phone.trim() || "21999999999",
           document: form.document.trim() || undefined,
         },
-        paymentMethod: method,
+        paymentMethod: toOrderPaymentMethod(method),
         ticketLines,
         visitDate,
         visitSlot,
         passportQuantity: product.type === "PASSPORT" ? lines[0]?.quantity : undefined,
       });
-      setResult({ orderId: placed.orderId });
+      setResult({ orderId: placed.orderId, method });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não foi possível criar o pedido.");
+      setPhase("idle");
     } finally {
       setSubmitting(false);
+      setPhase("idle");
     }
   }
 
   if (result) {
-    return (
-      <Card className="p-10 text-center">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand/10 text-brand">
-          <CheckCircle2 className="h-7 w-7" />
-        </span>
-        <h2 className="mt-4 font-display text-2xl font-semibold text-ink">
-          {ONERIO_VOICE.checkout.successTitle}
-        </h2>
-        <p className="mt-2 text-ink-muted">
-          Pedido <strong className="font-mono text-ink">{result.orderId.slice(0, 8)}</strong>.{" "}
-          {ONERIO_VOICE.checkout.successBody}
-        </p>
-        <p className="mx-auto mt-4 max-w-md rounded-xl bg-surface-subtle p-3 text-xs text-ink-subtle">
-          {ONERIO_VOICE.checkout.paymentNote}
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link href={`/conta/pedidos/${result.orderId}`}>
-            <Button>{ONERIO_VOICE.cta.viewOrder}</Button>
-          </Link>
-          <Link href="/conta/pedidos">
-            <Button variant="outline">Meus pedidos</Button>
-          </Link>
-        </div>
-      </Card>
-    );
+    return <PaymentSuccess orderId={result.orderId} method={result.method} />;
   }
+
+  const submitLabel =
+    phase === "paying"
+      ? `Processando ${paymentLabel(method)}…`
+      : phase === "saving"
+        ? "Registrando pedido…"
+        : `Pagar com ${paymentLabel(method)}`;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
@@ -149,10 +167,13 @@ export function CheckoutForm({
           </Card>
         ) : null}
 
-        <Card className="p-7 md:p-8">
+        <Card className="border-surface-border bg-white p-7 md:p-8">
           <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
             Seus dados
           </h2>
+          <p className="mt-1 text-sm text-ink-subtle">
+            Demonstração: campos opcionais — qualquer valor (ou vazio) funciona.
+          </p>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <Field label="Nome completo" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
             <Field label="E-mail" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
@@ -161,19 +182,28 @@ export function CheckoutForm({
           </div>
         </Card>
 
-        <Card className="p-7 md:p-8">
+        <Card className="border-surface-border bg-white p-7 md:p-8">
           <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
             Pagamento
           </h2>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <MethodOption active={method === "PIX"} onClick={() => setMethod("PIX")} icon={QrCode} title="Pix" desc="Aprovação imediata" />
-            <MethodOption active={method === "CREDIT_CARD"} onClick={() => setMethod("CREDIT_CARD")} icon={CreditCard} title="Cartão de crédito" desc="Em até 12x" />
+          <p className="mt-1 text-sm text-ink-subtle">
+            Simulação mocada: Pix, Apple Pay, Google Pay ou cartão — sempre aprovado.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <CreditCardFields
+              value={card}
+              onChange={setCard}
+              method={method}
+              onMethodChange={setMethod}
+              onPay={() => void onSubmit()}
+              paying={submitting}
+            />
           </div>
         </Card>
       </div>
 
       <aside>
-        <Card className="sticky top-24 p-7 shadow-float md:p-8">
+        <Card className="sticky top-24 border-surface-border bg-white p-7 shadow-float md:p-8">
           <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
             Resumo
           </h2>
@@ -200,17 +230,20 @@ export function CheckoutForm({
           <Button
             className="mt-6 w-full"
             size="lg"
-            disabled={!valid || submitting || !user}
+            disabled={submitting || !user}
             onClick={() => void onSubmit()}
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Salvando…
+                <Loader2 className="h-4 w-4 animate-spin" /> {submitLabel}
               </>
             ) : (
-              "Confirmar pedido"
+              submitLabel
             )}
           </Button>
+          <p className="mt-3 text-center text-xs text-ink-subtle">
+            Nenhum gateway real. Pagamento sempre aprovado nesta demo.
+          </p>
         </Card>
       </aside>
     </div>
@@ -235,48 +268,8 @@ function Field({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-12 w-full rounded-xl border border-surface-border bg-surface px-4 text-[15px] text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/15"
+        className="h-12 w-full rounded-xl border border-surface-border bg-surface-subtle px-4 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-subtle focus:border-brand focus:bg-white focus:ring-2 focus:ring-brand/15"
       />
     </label>
-  );
-}
-
-function MethodOption({
-  active,
-  onClick,
-  icon: Icon,
-  title,
-  desc,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: typeof QrCode;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex min-h-[4.5rem] items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-150",
-        active
-          ? "border-brand bg-brand/5 shadow-sm"
-          : "border-surface-border hover:border-brand/40",
-      )}
-    >
-      <span
-        className={cn(
-          "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl",
-          active ? "bg-brand text-brand-fg" : "bg-surface-subtle text-ink-muted",
-        )}
-      >
-        <Icon className="h-5 w-5" strokeWidth={2.25} />
-      </span>
-      <div>
-        <p className="text-[15px] font-semibold text-ink">{title}</p>
-        <p className="mt-0.5 text-sm text-ink-subtle">{desc}</p>
-      </div>
-    </button>
   );
 }

@@ -1,0 +1,149 @@
+.wrap {
+  text-align: center;
+  padding: 2.5rem 1.75rem;
+  animation: successFade 0.45s ease-out both;
+}
+
+@media (min-width: 768px) {
+  .wrap {
+    padding: 3rem 2.5rem;
+  }
+}
+
+.iconStage {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 0 auto;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid rgb(43 235 4 / 0.45);
+  animation: successRing 0.9s ease-out 0.15s both;
+}
+
+.badge {
+  position: absolute;
+  inset: 0.45rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #2beb04;
+  color: #00085f;
+  box-shadow: 0 10px 28px -10px rgb(43 235 4 / 0.7);
+  animation: successPop 0.55s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+.check {
+  width: 2rem;
+  height: 2rem;
+}
+
+.checkPath {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: successDraw 0.45s ease-out 0.28s forwards;
+}
+
+.title {
+  margin: 1.25rem 0 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.65rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgb(var(--ink));
+  animation: successFade 0.4s ease-out 0.2s both;
+}
+
+.body {
+  margin: 0.65rem auto 0;
+  max-width: 28rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgb(var(--ink-muted));
+  animation: successFade 0.4s ease-out 0.28s both;
+}
+
+.strong {
+  color: rgb(var(--ink));
+  font-weight: 600;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: rgb(var(--ink));
+  font-weight: 600;
+}
+
+.note {
+  margin: 1.15rem auto 0;
+  max-width: 28rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.85rem;
+  background: rgb(43 235 4 / 0.12);
+  border: 1px solid rgb(43 235 4 / 0.28);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: #1a5a10;
+  animation: successFade 0.4s ease-out 0.36s both;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  animation: successFade 0.4s ease-out 0.42s both;
+}
+
+@keyframes successPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes successDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes successRing {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes successFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
