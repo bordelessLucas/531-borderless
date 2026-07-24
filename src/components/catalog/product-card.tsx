@@ -13,7 +13,7 @@ export function ProductCard({ product }: { product: Product }) {
   const image = resolveProductImage(product.slug, product.heroImage);
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_0_45px_0_rgb(0_0_0_/_0.22)]">
+    <article className="flex h-full flex-col overflow-hidden rounded-[20px] bg-white shadow-card ring-1 ring-surface-border/60">
       <Link href={href} className="relative block aspect-[3/2] overflow-hidden bg-surface-subtle">
         <Image
           src={image.url}
@@ -24,18 +24,19 @@ export function ProductCard({ product }: { product: Product }) {
         />
       </Link>
       <div className="flex flex-1 flex-col gap-3 px-5 pb-5 pt-4">
-        <h3 className="font-sans text-base font-semibold leading-snug text-brand md:text-lg">
+        <h3 className="font-display text-lg font-semibold leading-snug text-brand md:text-[22px]">
           <Link href={href} className="hover:text-brand-muted">
             {product.name}
           </Link>
         </h3>
+        {product.tagline ? (
+          <p className="line-clamp-2 text-sm text-ink-muted">{product.tagline}</p>
+        ) : null}
         <div className="mt-auto flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-sm text-ink-muted">a partir de:</p>
-            <p className="font-display text-xl font-bold text-brand-muted">
-              {formatMoney(product.fromPrice)}
-            </p>
-          </div>
+          <p className="text-sm text-brand">
+            a partir de{" "}
+            <span className="font-semibold">{formatMoney(product.fromPrice)}</span>
+          </p>
           <Link
             href={href}
             className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-[15px] font-semibold text-brand-fg transition-colors hover:bg-brand-muted"
