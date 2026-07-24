@@ -49,10 +49,19 @@ export function AdminQueueLoader() {
   return <FulfillmentQueue items={items} />;
 }
 
+const STAT_ICONS = {
+  attractions: MapPinned,
+  passports: Ticket,
+  partners: Building2,
+  queue: Inbox,
+} as const;
+
+export type AdminStatIcon = keyof typeof STAT_ICONS;
+
 export function AdminPendingSummary({
   stats,
 }: {
-  stats: { label: string; value: number; icon: typeof Inbox; href: string }[];
+  stats: { label: string; value: number; icon: AdminStatIcon; href: string }[];
 }) {
   const [pending, setPending] = useState<Fulfillment[]>([]);
 
@@ -71,12 +80,14 @@ export function AdminPendingSummary({
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {withQueue.map((stat) => (
+        {withQueue.map((stat) => {
+          const Icon = STAT_ICONS[stat.icon];
+          return (
           <Link key={stat.label} href={stat.href}>
             <Card className="p-5 transition-colors hover:border-brand">
               <div className="flex items-center justify-between">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand">
-                  <stat.icon className="h-5 w-5" />
+                  <Icon className="h-5 w-5" />
                 </span>
                 <ArrowRight className="h-4 w-4 text-ink-subtle" />
               </div>
@@ -84,7 +95,8 @@ export function AdminPendingSummary({
               <p className="text-sm text-ink-muted">{stat.label}</p>
             </Card>
           </Link>
-        ))}
+          );
+        })}
       </div>
 
       <Card className="mt-8 p-6">
@@ -117,5 +129,3 @@ export function AdminPendingSummary({
   );
 }
 
-// re-export icons for page convenience
-export { Building2, Inbox, MapPinned, Ticket };

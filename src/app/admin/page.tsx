@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Building2, Inbox, MapPinned, Ticket } from "lucide-react";
 import { listAllProducts, listAttractions, listPartners } from "@/lib/repository";
 import { AdminPendingSummary } from "@/components/admin/admin-queue-loader";
 
@@ -12,10 +11,10 @@ export default async function AdminDashboard() {
   const passports = products.filter((p) => p.type === "PASSPORT");
 
   const stats = [
-    { label: "Atrações", value: attractions.length, icon: MapPinned, href: "/admin/atracoes" },
-    { label: "Passaportes", value: passports.length, icon: Ticket, href: "/admin/passaportes" },
-    { label: "Parceiros", value: partners.length, icon: Building2, href: "/admin/parceiros" },
-    { label: "Na fila de emissão", value: 0, icon: Inbox, href: "/admin/fila" },
+    { label: "Atrações", value: attractions.length, icon: "attractions" as const, href: "/admin/atracoes" },
+    { label: "Passaportes", value: passports.length, icon: "passports" as const, href: "/admin/passaportes" },
+    { label: "Parceiros", value: partners.length, icon: "partners" as const, href: "/admin/parceiros" },
+    { label: "Na fila de emissão", value: 0, icon: "queue" as const, href: "/admin/fila" },
   ];
 
   return (
