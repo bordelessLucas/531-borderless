@@ -126,8 +126,7 @@ export function SiteEditor({ site, partners, attractions }: SiteEditorProps) {
       });
       setMessage({ ok: true, text: "Site salvo." });
       if (!site) {
-        router.replace(`/admin/sites/${id}`);
-        router.refresh();
+        router.replace(`/admin/sites/editor?id=${id}`);
       }
     } catch (err) {
       setMessage({

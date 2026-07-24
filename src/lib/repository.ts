@@ -1,5 +1,3 @@
-import "server-only";
-
 import {
   collection,
   doc,
@@ -19,9 +17,9 @@ import { getDb } from "@/lib/firebase/client";
 import { COLLECTIONS } from "@/lib/firebase/collections";
 
 /**
- * Camada de acesso a dados via Firestore (Client SDK no servidor).
- * Catálogo é leitura pública nas rules — não exige Auth nem Cloud Functions.
- * Fulfillments sensíveis exigem staff; sem Auth/Admin caem em lista vazia.
+ * Camada de acesso a dados via Firestore (Client SDK).
+ * Roda no servidor (SSR/build) e no browser — o admin estático depende disso.
+ * Catálogo é leitura pública nas rules; fulfillments exigem staff.
  */
 
 const DEFAULT_SITE = process.env.NEXT_PUBLIC_DEFAULT_SITE ?? "onerio";

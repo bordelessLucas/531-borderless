@@ -116,8 +116,7 @@ export function AttractionEditor({
             : "Atração salva. Publique para aparecer na loja.",
       });
       if (!attraction) {
-        router.replace(`/admin/atracoes/${id}`);
-        router.refresh();
+        router.replace(`/admin/atracoes/editor?id=${id}`);
       } else {
         router.refresh();
       }

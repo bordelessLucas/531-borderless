@@ -8,10 +8,6 @@ MIDDLEWARE_SRC="src/middleware.ts"
 MIDDLEWARE_BAK="src/middleware.ts.static-bak"
 AUTH_ACTIONS="src/features/auth/actions.ts"
 AUTH_ACTIONS_BAK="src/features/auth/actions.ts.static-bak"
-ATTR_ACTIONS="src/features/attractions/actions.ts"
-ATTR_ACTIONS_BAK="src/features/attractions/actions.ts.static-bak"
-ADMIN_SRC="src/app/admin"
-ADMIN_BAK=".static-export-bak/admin"
 
 cleanup() {
   if [[ -f "$MIDDLEWARE_BAK" ]]; then
@@ -20,30 +16,17 @@ cleanup() {
   if [[ -f "$AUTH_ACTIONS_BAK" ]]; then
     mv "$AUTH_ACTIONS_BAK" "$AUTH_ACTIONS"
   fi
-  if [[ -f "$ATTR_ACTIONS_BAK" ]]; then
-    mv "$ATTR_ACTIONS_BAK" "$ATTR_ACTIONS"
-  fi
-  if [[ -d "$ADMIN_BAK" ]]; then
-    mkdir -p "$(dirname "$ADMIN_SRC")"
-    mv "$ADMIN_BAK" "$ADMIN_SRC"
-  fi
-  rmdir .static-export-bak 2>/dev/null || true
 }
 trap cleanup EXIT
 
 echo "→ Preparando export estático (plano Spark / sem Cloud Functions)…"
 
+# Middleware exige runtime de servidor; o admin usa AdminGuard no client.
 if [[ -f "$MIDDLEWARE_SRC" ]]; then
   mv "$MIDDLEWARE_SRC" "$MIDDLEWARE_BAK"
 fi
 
-# Admin fora de src/app — Next não pode tratar *.static-bak como rota
-if [[ -d "$ADMIN_SRC" ]]; then
-  mkdir -p .static-export-bak
-  mv "$ADMIN_SRC" "$ADMIN_BAK"
-fi
-
-# Server Actions incompatíveis com output: export — stubs só no build estático
+# Server Actions não existem em output: export. O login cai no papel vindo do Firestore.
 if [[ -f "$AUTH_ACTIONS" ]]; then
   mv "$AUTH_ACTIONS" "$AUTH_ACTIONS_BAK"
   cat > "$AUTH_ACTIONS" <<'EOF'
@@ -54,34 +37,10 @@ export async function establishSession(_idToken: string): Promise<{
   role?: UserRole;
   message?: string;
 }> {
-  return {
-    ok: false,
-    message: "Sessão server-side indisponível neste preview estático.",
-  };
+  return { ok: false, message: "Sessão de servidor indisponível no Hosting estático." };
 }
 
 export async function clearSession(): Promise<void> {}
-EOF
-fi
-
-if [[ -f "$ATTR_ACTIONS" ]]; then
-  mv "$ATTR_ACTIONS" "$ATTR_ACTIONS_BAK"
-  cat > "$ATTR_ACTIONS" <<'EOF'
-export type AttractionActionState = {
-  ok: boolean;
-  message: string;
-  errors?: Record<string, string[]>;
-};
-
-export async function saveAttraction(
-  _prev: AttractionActionState,
-  _formData: FormData,
-): Promise<AttractionActionState> {
-  return {
-    ok: false,
-    message: "Admin write indisponível neste preview estático.",
-  };
-}
 EOF
 fi
 

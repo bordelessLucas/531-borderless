@@ -14,6 +14,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getDb, getFirebaseAuth } from "@/lib/firebase/client";
 import { COLLECTIONS } from "@/lib/firebase/collections";
 import { establishSession, clearSession } from "@/features/auth/actions";
+import { resolveRoleFromFirestore } from "@/features/auth/role-client";
 import type { AppUser, UserRole } from "@/features/auth/types";
 
 async function syncUserDocument(
@@ -51,14 +52,15 @@ export async function completeSignIn(user: User): Promise<{
 }> {
   await syncUserDocument(user);
   const idToken = await user.getIdToken(true);
-  const result = await establishSession(idToken);
-  if (!result.ok || !result.role) {
-    throw new Error(result.message ?? "Não foi possível criar a sessão.");
+
+  try {
+    const result = await establishSession(idToken);
+    if (result.ok && result.role) return { role: result.role };
+  } catch {
+    // Sem runtime de servidor (export estático): segue com o papel do Firestore.
   }
 
-  // Se o servidor reconheceu staff (ADMIN_EMAILS), espelha no doc quando já era customer
-  // — só atualiza campos não-role; promote real fica no script com bootstrap.
-  return { role: result.role };
+  return { role: await resolveRoleFromFirestore(user.uid, user.email) };
 }
 
 export async function signInWithEmail(email: string, password: string) {
@@ -89,7 +91,11 @@ export async function signInWithGoogle() {
 
 export async function signOutUser() {
   await signOut(getFirebaseAuth());
-  await clearSession();
+  try {
+    await clearSession();
+  } catch {
+    // Export estático: não há cookie de sessão para limpar.
+  }
 }
 
 export function subscribeAuth(callback: (user: User | null) => void) {

@@ -133,7 +133,7 @@ export function OrdersList() {
     <ul className="space-y-4">
       {orders.map((order) => (
         <li key={order.id}>
-          <Link href={`/conta/pedidos/${order.id}`}>
+          <Link href={`/conta/pedidos/detalhe?id=${order.id}`}>
             <Card className="p-5 transition-colors hover:border-brand">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>

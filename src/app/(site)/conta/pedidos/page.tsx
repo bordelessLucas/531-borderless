@@ -1,16 +1,19 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
-import { getServerSession } from "@/features/auth/server";
+import { useAuth } from "@/features/auth/auth-provider";
 import { ONERIO_VOICE } from "@/features/tenant/voice";
 import { OrdersList } from "@/components/account/orders-panel";
 import { Button } from "@/components/ui/button";
 
-export const metadata: Metadata = { title: "Meus pedidos" };
+export default function ContaPedidosPage() {
+  const { user, isLoading } = useAuth();
 
-export default async function ContaPedidosPage() {
-  const session = await getServerSession();
+  if (isLoading) {
+    return <p className="container py-20 text-center text-ink-muted">Carregando…</p>;
+  }
 
-  if (!session) {
+  if (!user) {
     return (
       <div className="container py-20 text-center">
         <h1 className="font-display text-2xl font-semibold text-ink">Meus pedidos</h1>

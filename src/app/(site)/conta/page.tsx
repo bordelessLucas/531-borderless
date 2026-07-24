@@ -1,15 +1,18 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
-import { getServerSession } from "@/features/auth/server";
+import { useAuth } from "@/features/auth/auth-provider";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export const metadata: Metadata = { title: "Minha conta" };
+export default function ContaPage() {
+  const { user, role, isLoading } = useAuth();
 
-export default async function ContaPage() {
-  const session = await getServerSession();
+  if (isLoading) {
+    return <p className="container py-20 text-center text-ink-muted">Carregando…</p>;
+  }
 
-  if (!session) {
+  if (!user) {
     return (
       <div className="container py-20 text-center">
         <h1 className="font-display text-2xl font-semibold text-ink">Minha conta</h1>
@@ -25,9 +28,9 @@ export default async function ContaPage() {
     <div className="container py-12">
       <header className="mb-8">
         <h1 className="font-display text-3xl font-semibold text-ink">
-          Olá, {session.name ?? "cliente"}
+          Olá, {user.displayName ?? "cliente"}
         </h1>
-        <p className="mt-1 text-ink-muted">{session.email}</p>
+        <p className="mt-1 text-ink-muted">{user.email}</p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -41,11 +44,11 @@ export default async function ContaPage() {
           </Link>
         </Card>
 
-        {session.role === "admin" || session.role === "operator" ? (
+        {role === "admin" || role === "operator" ? (
           <Card className="p-6">
             <h2 className="font-display text-xl font-semibold text-ink">Backoffice</h2>
             <p className="mt-1 text-sm text-ink-muted">
-              Você tem acesso staff ({session.role}).
+              Você tem acesso staff ({role}).
             </p>
             <Link href="/admin" className="mt-5 inline-block">
               <Button variant="secondary">Abrir admin</Button>

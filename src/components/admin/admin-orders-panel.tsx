@@ -113,7 +113,7 @@ export function AdminOrdersPanel() {
               <tr key={o.id} className="hover:bg-surface-subtle">
                 <td className="px-5 py-4">
                   <Link
-                    href={`/conta/pedidos/${o.id}`}
+                    href={`/conta/pedidos/detalhe?id=${o.id}`}
                     className="font-mono text-xs text-brand hover:underline"
                   >
                     {o.id.slice(0, 10)}…

@@ -91,8 +91,7 @@ export function PassportEditor({ product, attractions, ticketTypes }: PassportEd
       });
       setMessage({ ok: true, text: "Passaporte salvo." });
       if (!product) {
-        router.replace(`/admin/passaportes/${id}`);
-        router.refresh();
+        router.replace(`/admin/passaportes/editor?id=${id}`);
       }
     } catch (err) {
       setMessage({
@@ -241,7 +240,7 @@ export function PassportEditor({ product, attractions, ticketTypes }: PassportEd
                         {" "}
                         — configure em{" "}
                         <a
-                          href={`/admin/atracoes/${attraction.id}`}
+                          href={`/admin/atracoes/editor?id=${attraction.id}`}
                           className="text-brand hover:underline"
                         >
                           {attraction.name}

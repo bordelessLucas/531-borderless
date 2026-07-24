@@ -1,17 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { getPartnerById, listSites } from "@/lib/repository";
+import { listPartners, listSites } from "@/lib/repository";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAdminData } from "@/components/admin/use-admin-data";
 
-export default async function AdminSitesPage() {
-  const sites = await listSites();
-  const sitesWithPartner = await Promise.all(
-    sites.map(async (site) => ({
+export default function AdminSitesPage() {
+  const { data, error, isLoading } = useAdminData(async () => {
+    const [sites, partners] = await Promise.all([listSites(), listPartners()]);
+    const partnersById = new Map(partners.map((p) => [p.id, p]));
+    return sites.map((site) => ({
       site,
-      partner: site.partnerId ? await getPartnerById(site.partnerId) : null,
-    })),
-  );
+      partner: site.partnerId ? (partnersById.get(site.partnerId) ?? null) : null,
+    }));
+  }, "sites");
 
   return (
     <div>
@@ -25,16 +29,19 @@ export default async function AdminSitesPage() {
             plataforma, temas e catálogos diferentes.
           </p>
         </div>
-        <Link href="/admin/sites/novo">
+        <Link href="/admin/sites/editor">
           <Button>
             <Plus className="h-4 w-4" /> Novo site
           </Button>
         </Link>
       </header>
 
+      {error ? <p className="mb-6 text-sm text-red-600">{error}</p> : null}
+      {isLoading ? <p className="text-sm text-ink-muted">Carregando sites…</p> : null}
+
       <div className="grid gap-5 md:grid-cols-2">
-        {sitesWithPartner.map(({ site, partner }) => (
-          <Link key={site.id} href={`/admin/sites/${site.id}`}>
+        {(data ?? []).map(({ site, partner }) => (
+          <Link key={site.id} href={`/admin/sites/editor?id=${site.id}`}>
             <Card className="h-full p-6 transition-colors hover:border-brand/40">
               <div className="flex items-center gap-3">
                 <span

@@ -110,8 +110,7 @@ export function PartnerEditor({ partner }: PartnerEditorProps) {
       });
       setMessage({ ok: true, text: "Parceiro salvo." });
       if (!partner) {
-        router.replace(`/admin/parceiros/${id}`);
-        router.refresh();
+        router.replace(`/admin/parceiros/editor?id=${id}`);
       }
     } catch (err) {
       setMessage({

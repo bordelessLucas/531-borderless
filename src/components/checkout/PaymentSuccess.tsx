@@ -50,7 +50,7 @@ export function PaymentSuccess({ orderId, method }: PaymentSuccessProps) {
         </p>
 
         <div className={styles.actions}>
-          <Link href={`/conta/pedidos/${orderId}`}>
+          <Link href={`/conta/pedidos/detalhe?id=${orderId}`}>
             <Button>{ONERIO_VOICE.cta.viewOrder}</Button>
           </Link>
           <Link href="/conta/pedidos">

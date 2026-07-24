@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { ExternalLink, Plus } from "lucide-react";
-import { getPartnerById, listAllAttractions, listAllProducts } from "@/lib/repository";
+import { listAllAttractions, listAllProducts, listPartners } from "@/lib/repository";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAdminData } from "@/components/admin/use-admin-data";
 
 const modeLabel: Record<string, string> = {
   SCHEDULED: "Data e horário",
@@ -10,24 +13,23 @@ const modeLabel: Record<string, string> = {
   OPEN: "Sem data",
 };
 
-export default async function AdminAtracoesPage() {
-  const [attractions, products] = await Promise.all([
-    listAllAttractions(),
-    listAllProducts(),
-  ]);
-  const simpleByAttraction = new Map(
-    products
-      .filter((p) => p.type === "SIMPLE" && p.attractionId)
-      .map((p) => [p.attractionId!, p]),
-  );
-  const partnersById = new Map(
-    await Promise.all(
-      [...new Set(attractions.map((a) => a.partnerId))].map(async (id) => {
-        const partner = await getPartnerById(id);
-        return [id, partner] as const;
-      }),
-    ),
-  );
+export default function AdminAtracoesPage() {
+  const { data, error, isLoading } = useAdminData(async () => {
+    const [attractions, products, partners] = await Promise.all([
+      listAllAttractions(),
+      listAllProducts(),
+      listPartners(),
+    ]);
+    return {
+      attractions,
+      simpleByAttraction: new Map(
+        products
+          .filter((p) => p.type === "SIMPLE" && p.attractionId)
+          .map((p) => [p.attractionId!, p]),
+      ),
+      partnersById: new Map(partners.map((p) => [p.id, p])),
+    };
+  }, "atracoes");
 
   return (
     <div>
@@ -38,78 +40,83 @@ export default async function AdminAtracoesPage() {
             Cadastro, ingressos, calendário e publicação na vitrine.
           </p>
         </div>
-        <Link href="/admin/atracoes/nova">
+        <Link href="/admin/atracoes/editor">
           <Button>
             <Plus className="h-4 w-4" /> Nova atração
           </Button>
         </Link>
       </header>
 
-      <Card className="overflow-hidden">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-surface-border bg-surface-subtle text-xs uppercase text-ink-subtle">
-            <tr>
-              <th className="px-5 py-3 font-medium">Atração</th>
-              <th className="px-5 py-3 font-medium">Parceiro</th>
-              <th className="px-5 py-3 font-medium">Disponibilidade</th>
-              <th className="px-5 py-3 font-medium">Emissão</th>
-              <th className="px-5 py-3 font-medium">Vitrine</th>
-              <th className="px-5 py-3 font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-surface-border">
-            {attractions.map((a) => {
-              const partner = partnersById.get(a.partnerId);
-              const product = simpleByAttraction.get(a.id);
-              return (
-                <tr key={a.id} className="transition-colors hover:bg-surface-subtle">
-                  <td className="px-5 py-4">
-                    <Link
-                      href={`/admin/atracoes/${a.id}`}
-                      className="font-medium text-ink hover:text-brand"
-                    >
-                      {a.name}
-                    </Link>
-                    <p className="text-xs text-ink-subtle">{a.city}</p>
-                  </td>
-                  <td className="px-5 py-4 text-ink-muted">{partner?.name ?? "—"}</td>
-                  <td className="px-5 py-4 text-ink-muted">
-                    {modeLabel[a.availability.mode]}
-                  </td>
-                  <td className="px-5 py-4 text-ink-muted">
-                    {partner?.defaultStrategy === "API" ? "API" : "Manual"}
-                  </td>
-                  <td className="px-5 py-4">
-                    {product?.status === "PUBLISHED" ? (
+      {error ? <p className="mb-6 text-sm text-red-600">{error}</p> : null}
+      {isLoading ? <p className="text-sm text-ink-muted">Carregando atrações…</p> : null}
+
+      {data ? (
+        <Card className="overflow-hidden">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-surface-border bg-surface-subtle text-xs uppercase text-ink-subtle">
+              <tr>
+                <th className="px-5 py-3 font-medium">Atração</th>
+                <th className="px-5 py-3 font-medium">Parceiro</th>
+                <th className="px-5 py-3 font-medium">Disponibilidade</th>
+                <th className="px-5 py-3 font-medium">Emissão</th>
+                <th className="px-5 py-3 font-medium">Vitrine</th>
+                <th className="px-5 py-3 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-border">
+              {data.attractions.map((a) => {
+                const partner = data.partnersById.get(a.partnerId);
+                const product = data.simpleByAttraction.get(a.id);
+                return (
+                  <tr key={a.id} className="transition-colors hover:bg-surface-subtle">
+                    <td className="px-5 py-4">
                       <Link
-                        href={`/atracoes/${product.slug}`}
-                        className="inline-flex items-center gap-1 text-brand hover:underline"
+                        href={`/admin/atracoes/editor?id=${a.id}`}
+                        className="font-medium text-ink hover:text-brand"
                       >
-                        Na loja <ExternalLink className="h-3.5 w-3.5" />
+                        {a.name}
                       </Link>
-                    ) : product ? (
-                      <span className="text-xs text-ink-subtle">Rascunho</span>
-                    ) : (
-                      <span className="text-xs text-amber-700">Salve para publicar</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        a.status === "PUBLISHED"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-surface-subtle text-ink-muted"
-                      }`}
-                    >
-                      {a.status === "PUBLISHED" ? "Publicada" : a.status}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </Card>
+                      <p className="text-xs text-ink-subtle">{a.city}</p>
+                    </td>
+                    <td className="px-5 py-4 text-ink-muted">{partner?.name ?? "—"}</td>
+                    <td className="px-5 py-4 text-ink-muted">
+                      {modeLabel[a.availability.mode]}
+                    </td>
+                    <td className="px-5 py-4 text-ink-muted">
+                      {partner?.defaultStrategy === "API" ? "API" : "Manual"}
+                    </td>
+                    <td className="px-5 py-4">
+                      {product?.status === "PUBLISHED" ? (
+                        <Link
+                          href={`/atracoes/${product.slug}`}
+                          className="inline-flex items-center gap-1 text-brand hover:underline"
+                        >
+                          Na loja <ExternalLink className="h-3.5 w-3.5" />
+                        </Link>
+                      ) : product ? (
+                        <span className="text-xs text-ink-subtle">Rascunho</span>
+                      ) : (
+                        <span className="text-xs text-amber-700">Salve para publicar</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-4">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          a.status === "PUBLISHED"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-surface-subtle text-ink-muted"
+                        }`}
+                      >
+                        {a.status === "PUBLISHED" ? "Publicada" : a.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </Card>
+      ) : null}
     </div>
   );
 }

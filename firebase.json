@@ -10,10 +10,12 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "cleanUrls": false,
+    "trailingSlash": true,
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/404.html"
       }
     ],
     "headers": [

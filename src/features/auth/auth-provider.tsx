@@ -42,18 +42,23 @@ export function AuthProvider({
   useEffect(() => {
     const unsub = subscribeAuth((next) => {
       setUser(next);
-      setIsLoading(false);
-      if (next) {
-        void refreshSessionIfSignedIn()
-          .then((res) => {
-            if (res?.role) setRole(res.role);
-          })
-          .catch(() => {
-            /* sessão pode expirar; middleware redireciona */
-          });
-      } else {
+
+      if (!next) {
         setRole(null);
+        setIsLoading(false);
+        return;
       }
+
+      // Só libera a UI depois de resolver o papel, senão o guard do admin nega acesso.
+      setIsLoading(true);
+      void refreshSessionIfSignedIn()
+        .then((res) => {
+          if (res?.role) setRole(res.role);
+        })
+        .catch(() => {
+          /* sessão pode expirar; guard e middleware redirecionam */
+        })
+        .finally(() => setIsLoading(false));
     });
     return unsub;
   }, []);

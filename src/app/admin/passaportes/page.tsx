@@ -1,25 +1,30 @@
+"use client";
+
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { getAttractionById, listAllProducts } from "@/lib/repository";
+import { listAllAttractions, listAllProducts } from "@/lib/repository";
 import { formatMoney } from "@/features/shared/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAdminData } from "@/components/admin/use-admin-data";
 
-export default async function AdminPassaportesPage() {
-  const products = await listAllProducts();
-  const passports = products.filter((p) => p.type === "PASSPORT");
-
-  const compositionRows = await Promise.all(
-    passports.map(async (p) => ({
-      product: p,
-      items: await Promise.all(
-        (p.composition?.items ?? []).map(async (item) => ({
+export default function AdminPassaportesPage() {
+  const { data, error, isLoading } = useAdminData(async () => {
+    const [products, attractions] = await Promise.all([
+      listAllProducts(),
+      listAllAttractions(),
+    ]);
+    const attractionsById = new Map(attractions.map((a) => [a.id, a]));
+    return products
+      .filter((p) => p.type === "PASSPORT")
+      .map((product) => ({
+        product,
+        items: (product.composition?.items ?? []).map((item) => ({
           item,
-          attraction: await getAttractionById(item.attractionId),
+          attraction: attractionsById.get(item.attractionId) ?? null,
         })),
-      ),
-    })),
-  );
+      }));
+  }, "passaportes");
 
   return (
     <div>
@@ -28,16 +33,19 @@ export default async function AdminPassaportesPage() {
           <h1 className="font-display text-3xl font-semibold text-ink">Passaportes</h1>
           <p className="mt-1 text-ink-muted">Produtos compostos por múltiplas atrações.</p>
         </div>
-        <Link href="/admin/passaportes/novo">
+        <Link href="/admin/passaportes/editor">
           <Button>
             <Plus className="h-4 w-4" /> Novo passaporte
           </Button>
         </Link>
       </header>
 
+      {error ? <p className="mb-6 text-sm text-red-600">{error}</p> : null}
+      {isLoading ? <p className="text-sm text-ink-muted">Carregando passaportes…</p> : null}
+
       <div className="grid gap-5 md:grid-cols-2">
-        {compositionRows.map(({ product: p, items }) => (
-          <Link key={p.id} href={`/admin/passaportes/${p.id}`}>
+        {(data ?? []).map(({ product: p, items }) => (
+          <Link key={p.id} href={`/admin/passaportes/editor?id=${p.id}`}>
             <Card className="p-6 transition-colors hover:border-brand">
               <div className="flex items-start justify-between">
                 <div>
