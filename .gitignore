@@ -35,3 +35,6 @@ serviceAccountKey.json
 # typescript
 *.tsbuildinfo
 .static-export-bak/
+
+# documentação interna (planejamento) — não versionar
+/docs/
